@@ -1,64 +1,170 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Game Night</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="./webapp/dist/js/script.js"></script>
-</head>
-<body>
-    <h1>Hello World !</h1>
+    <title>Soirée jeux</title>
     
-    <!-- EXEMPLE DE LOGIN
-    <div class="col-sm-6 col-sm-offset-3">
+    <!-- CSS -->
+    <link href="bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap/metisMenu.min.css" rel="stylesheet">
+    <link href="bootstrap/sb-admin-2.min.css" rel="stylesheet" type="text/css" />
+    <link href="bootstrap/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
-        <h1><span class="fa fa-sign-in"></span> Login</h1>
+    <!-- NOTIFY -->
+    <link rel="stylesheet" type="text/css" href="bootstrap/notify/animate.css"/> 
+    <!-- DATATABLES -->
+    <link rel="stylesheet" type="text/css" href="bootstrap/dataTables/css/dataTables.bootstrap.min.css">
 
-        <form action="/login" method="post">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="text" class="form-control" name="email">
+</head>
+
+<body>
+
+    <!-- Connexion -->
+    <div id="divConnexion" class="container" style="display: none;z-index:100;">
+        <div class="row">
+            <img src="./img/soiree_jeux_logo.png" alt="Soiree Jeux (logo)"
+                style="width: 400px; height: 139px; display: block; margin: 0 auto; margin-top: 100px; margin-bottom: 0;">
+            
+            <div class="col-md-4 col-md-offset-4">
+                <div class="login-panel panel panel-primary" style="margin-top: 20px;">
+                    
+                    <div class="panel-heading"
+                        style="display: flex; align-items: center; justify-content: center;">
+                        <h3 class="panel-title"><b>Connexion</b></h3>
+                    </div>
+                    
+                    <div class="panel-body">
+                        <form id="formLogin" role="form">
+                            <div class="form-group input-group">
+                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                <input id="login" class="form-control" placeholder="Email"
+                                    name="email" type="text" autofocus>
+                            </div>
+                            <div class="form-group input-group">
+                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                <input id="mdp" class="form-control" placeholder="Mot de passe"
+                                    name="mdp" type="password">
+                            </div>
+                            <!--GESTION EREURS <div class="errorMessages"></div> -->
+                            <div
+                                style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                                <button type="button" class="btn btn-link"
+                                    id="butNotYetRegister">Pas encore inscrit ?</button>
+                            </div>
+                            <button type="button" class="btn btn-lg btn-primary btn-block"
+                                id="butLogIn">Se connecter</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-control" name="password">
-            </div>
-
-            <button type="submit" class="btn btn-success btn-lg">Login</button>
-        </form>
-    </div> -->
-
-    <!-- EXEMPLE DE SIGNUP
-    <div id="signup">
-        <div class="col-sm-6 col-sm-offset-3">
-
-            <h1><span class="fa fa-sign-in"></span> Identification</h1>
-
-            <form action="/signup" method="post">
-                <div class="form-group">
-                    <label>Nom</label>
-                    <input type="text" class="form-control" name="lastname">
-                </div>
-                <div class="form-group">
-                    <label>Prénom</label>
-                    <input type="text" class="form-control" name="firstname">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="text" class="form-control" name="email">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-control" name="password">
-                </div>
-
-                <button type="submit" class="btn btn-danger btn-lg">Signup</button>
-            </form>
         </div>
-    </div> -->
+    </div>
+
+
+    <!-- Inscription -->
+    <div id="divInscription" class="container" style="display: none;z-index:100;">
+        <div class="row">
+            <img src="./img/soiree_jeux_logo.png" alt="Soiree Jeux (logo)"
+                style="width: 550px; height: 173px; display: block; margin: 0 auto; margin-top: 50px; margin-bottom: 0;">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="panel panel-primary" style="margin-top: 20px;">
+                    <div class="panel-heading"
+                        style="display: flex; align-items: center; justify-content: center;">
+                        <h3 class="panel-title">
+                            <b>Inscription</b>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <form role="form" id="formInscription">
+                            <label>Utilisateur</label>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group input-group">
+                                        <span class="input-group-addon"><i class="fa fa-user"></i></span><input
+                                            class="form-control" placeholder="Nom" name="nom" type="text"
+                                            autofocus>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group input-group">
+                                        <span class="input-group-addon"><i class="fa fa-user"></i></span><input
+                                            class="form-control" placeholder="Prénom" name="prenom"
+                                            type="text">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            <label>Compte</label>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group input-group">
+                                        <span class="input-group-addon"><i
+                                            class="fa fa-envelope"></i></span><input class="form-control"
+                                            placeholder="Email" name="mail" type="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group input-group">
+                                        <span class="input-group-addon"><i class="fa fa-lock"></i></span><input
+                                            class="form-control" placeholder="Mot de passe"
+                                            name="mdpEntree" type="password">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group input-group">
+                                        <span class="input-group-addon"><i class="fa fa-lock"></i></span><input
+                                            class="form-control"
+                                            placeholder="Mot de passe (confirmation)"
+                                            name="mdpConfirmation" type="password">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- GESTION ERREURS <div class="errorMessages"></div> -->
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                                        <button id="butRegisterReturn" type="button"
+                                            class="btn btn-outline btn-primary btn-lg">Retour</button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                                        <button id="butRegister" type="button" class="btn btn-lg btn-primary">S'inscrire</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- SCRIPTS -->
+    <script src="bootstrap/jquery-3.2.1.min.js" type="text/javascript"></script>
+    <script src="bootstrap/bootstrap.min.js"></script>
+    <script src="bootstrap/metisMenu.min.js"></script>
+    <script src="bootstrap/sb-admin-2.min.js" type="text/javascript"></script>
+    
+    <!-- NOTIFY -->
+    <script src="bootstrap/notify/bootstrap-notify.min.js" type="text/javascript"></script>
+    <!-- DATATABLES -->
+    <script src="bootstrap/dataTables/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="bootstrap/dataTables/js/dataTables.bootstrap.min.js" type="text/javascript"></script>
+
+
+    <script src="dist/js/script.js"></script>
+
 </body>
 </html>

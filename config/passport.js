@@ -1,4 +1,5 @@
 var LocalStrategy   = require('passport-local').Strategy;
+var logger = require('./logger');
 
 var User = require('../app/models/user');
 
@@ -19,25 +20,29 @@ module.exports = function(passport) {
         passReqToCallback : true // allows us to pass back the entire request to the callback
     },
     function(req, email, password, done) {
-        User.findOne({ 'local.email' :  email }, function(err, user) {
-            if (err)
+        User.findOne({ 'email' :  email }, function(err, user) {
+            if (err) {
+                logger.info("An error occured when trying to find the user");
                 return done(err);
+            }
 
             if (user) {
-                // Means no user has been found, send message to say so
+                logger.info("The user allready exists");
                 return done(null, false);
             } else {
                 var newUser = new User();
 
-                newUser.local.firstname = req.body.firstname;
-                newUser.local.lastname = req.body.lastname;
-                newUser.local.email = email;
-                newUser.local.password = newUser.generateHash(password);
+                newUser.firstname = req.body.firstname;
+                newUser.lastname = req.body.lastname;
+                newUser.email = email;
+                newUser.password = newUser.generateHash(password);
 
                 // save the user
                 newUser.save(function(err) {
                     if (err)
+                        logger.info("An error occured while trying to save the user");
                         throw err;
+                    logger.info("The user has been added");
                     return done(null, newUser);
                 });
             }
@@ -52,15 +57,21 @@ module.exports = function(passport) {
         passReqToCallback : true // allows us to pass back the entire request to the callback
     },
     function(req, email, password, done) {
-        User.findOne({ 'local.email': email }, function(err, user) {
-            if (err)
+        User.findOne({ 'email': email }, function(err, user) {
+            if (err) {
+                logger.info("An error occured when trying to find the user");
                 return done(err);
+            }
 
-            if (!user)
-                return done(null, false, req.flash('loginMessage', 'User not found.'));
+            if (!user) {
+                logger.info("User not found");
+                return done(null, false);
+            }
 
-            if (!user.validPassword(password))
-                return done(null, false, req.flash('loginMessage', 'Wrong password.')); 
+            if (!user.validPassword(password)) {
+                logger.info("Wrong password.");
+                return done(null, false); 
+            }
 
             return done(null, user);
         });

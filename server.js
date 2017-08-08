@@ -33,7 +33,8 @@ app.use('/webapp', express.static(path.join(__dirname, '/views')));
 app.use(session({
     secret: 'SDFGsdfgsdfgDFg hjgJFGH ertyERTdff',
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: { maxAge: 1200000 } // 20 minutes (in milliseconds)
 }));
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions

@@ -1,4 +1,5 @@
 var fs = require('fs');
+var logger = require('../config/logger');
 'use strict';
 
 // To check if a user is authenticated use

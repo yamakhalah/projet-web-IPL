@@ -48,6 +48,87 @@
         </div><!--/.nav-collapse -->
     </div>
 </nav>
+<div id="nightManagementContainer" class="container" style="display: block;z-index: 100; margin-top: 150px;">
+    <div class="row">
+        <div class="col-md-3 text-center">
+            <div class="panel panel-red">
+                <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
+                    <h3 class="panel-title"><b>Gestion de soirée</b></h3>
+                </div>
+                <div class="panel-body">
+                    <div>
+                        <label><button type="button" class="btn btn-primary" style="width: 150px">Créer</button></label>
+                    </div>
+                    <div>
+                        <label><button  type="button" class="btn btn-primary" style="width: 150px">Gérer</button></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 col-md-offset-1">
+            <div class="panel panel-primary">
+                <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
+                    <h3 class="panel-title"><b>Création</b></h3>
+                </div>
+                <div class="panel-body">
+                    <form id="formCreation" role="form">
+                        <div class="form-group">
+                            <label>Nom de la soirée</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-comment"></i></span>
+                                <input id="name" class="form-control" placeholder="Nom"
+                                       name="name" type="text" autofocus>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Date de la soirée</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                <input id="date" class="form-control" placeholder="06/07/1993"
+                                       name="name" type="date">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-file-text"></i></span>
+                                <textarea id="description" class="form-control" placeholder="Décrivez votre soirée ici."
+                                       name="description" type="text" rows=8 style="height: 100px"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Début</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-hourglass"></i></span>
+                                <select id="hourBegin" class="form-control">
+                                    <option>A IMPLEMENTER EN JS</option>
+                                </select>
+                            </div>
+                            <label>Fin</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-hourglass"></i></span>
+                                <select id="hourEnd" class="form-control">
+                                    <option>A IMPLEMENTER EN JS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+                <div class="panel panel-primary">
+                    <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
+                        <h3 class="panel-title"><b>Jeux</b></h3>
+                    </div>
+                    <div class="panel-body">
+                        <form id="formJeux" role="form">
+
+                        </form>
+                </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

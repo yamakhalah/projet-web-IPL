@@ -22,15 +22,15 @@ $(document).ready(function() {
     })
 
     $('#displayGames').click(function () {
-
+        toggleDiv('divGames');
     })
 
     $('#displayInvitations').click(function () {
-        toggleDiv('divInvitations')
+        toggleDiv('divInvitations');
     })
 
     $('#displayManagement').click(function () {
-        toggleDiv('divManagement')
+        toggleDiv('divManagement');
     })
 
     $('#displayNight').click(function () {

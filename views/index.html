@@ -353,6 +353,57 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div id="divGames" class="container" style="display: none;z-index: 100; margin-top: 150px;">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="panel-default panel panel-primary" style="margin-top: 250px">
+                    <div id="gamesTable" class="panel-body">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel-default panel panel-primary" style="margin-top: 100px">
+                    <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
+                        <h3 class="panel-title"><b>Ajouter un jeu</b></h3>
+                    </div>
+                    <div id="gamesForm" class="panel-body">
+                        <form id="addGameForm" role="form">
+                            <div class="form-group">
+                                <label>Image</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-image"></i></span>
+                                    <input id="gamePicture" class="form-control" placeholder="jeu.jpg"
+                                           name="gamePicture" type="file" autofocus>
+                                </div>
+                                <label>Nom</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-comment"></i></span>
+                                    <input id="gameName" class="form-control" placeholder="Nom du jeu"
+                                           name="gameName" type="text">
+                                </div>
+                                <label>Description</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-file-text"></i></span>
+                                    <textarea id="gameDescription" class="form-control" placeholder="Décrivez votre jeu ici."
+                                              name="gameDescription" type="text" rows=8 style="height: 100px"></textarea>
+                                </div>
+                                <div class="input-group" style="margin-top: 10px">
+                                    <label>Min</label>
+                                    <input id="gameMin" class="form-control" placeholder="0"
+                                           name="gameMin" type="text" style="width: 50px">
+                                    <label>Max</label>
+                                    <input id="gameMax" class="form-control" placeholder="0"
+                                           name="gameMax" type="text" style="width: 50px">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -36,10 +36,10 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a id="displayInvitations">Invitations</a></li>
-                    <li><a id="displayManagement">Gestion de soirées</a></li>
-                    <li><a id="displayNight">Soirées à venir</a></li>
-                    <li><a id="displayGames">Jeux</a></li>
+                    <li id="invite" class="active"><a id="displayInvitations">Invitations</a></li>
+                    <li id="management" ><a id="displayManagement">Gestion de soirées</a></li>
+                    <li id="night"><a id="displayNight">Soirées à venir</a></li>
+                    <li id="game"><a id="displayGames">Jeux</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a id="disconnection">Déconnexion</a></li>
@@ -269,7 +269,7 @@
                                         <option>A IMPLEMENTER EN JS</option>
                                     </select>
                                 </div>
-                                <label><button id="validateNightButton" type="button" class="btn btn-success" style="width: 150px; margin-top: 20px">Valider et inviter</button></label>
+                                <button id="validateNightButton" type="button" class="btn btn-success btn-block" style=" margin-top: 20px">Valider et inviter</button>
                             </div>
 
 
@@ -286,25 +286,23 @@
                         <form id="exemple2" role="form">
                             <div id="sectionCreate2Form" class="form-group">
                                 <label>Liste d'utilisateurs</label>
-                                <div id="exempleCheckbox1" class="checkbox">
+                                <div id="exempleCheckboxA1" class="checkbox">
                                     <label><input type="checkbox" value="idInDB1">Nom prenom</label>
                                 </div>
-                                <div id="exempleCheckbox2" class="checkbox">
+                                <div id="exempleCheckboxA2" class="checkbox">
                                     <label><input type="checkbox" value="idInDB2">Nom prenom</label>
                                 </div>
-                                <div id="exempleCheckbox3" class="checkbox">
+                                <div id="exempleCheckboxA3" class="checkbox">
                                     <label><input type="checkbox" value="idInDB3">Nom prenom</label>
                                 </div>
                             </div>
-                            <div class="input-group">
-                                <label>Inviter par email</label>
-                                <input id="section2emailInput" class="form-control" placeholder="uneAdresse@unFournisseur.com"
-                                       name="name" type="text">
-                                <button id="addUserEmailButton" class="btn btn-primary" type="button">Ajouter</button>
+                            <div class="form-group">
+                                <label class="visible-md-block">Inviter par email</label>
+                                <input id="section2emailInput"  placeholder="uneAdresse@unFournisseur.com"
+                                       name="name" type="text" style="width: 200px">
+                                <button id="addUserEmailButton" class="btn btn-primary" type="button" style="margin-left: 40px">Ajouter</button>
                             </div>
-                            <div class="input-group">
-                                <button id="sendInvitesButton" class="btn btn-success" type="button" style="width: 250px; margin-top: 35px">Envoyer les invitations</button>
-                            </div>
+                            <button id="sendInvitesButton" class="btn btn-success btn-block" type="button" style=" margin-top: 35px">Envoyer les invitations</button>
                         </form>
 
                     </div>
@@ -347,21 +345,38 @@
                                 </tbody>
                             </table>
                             </div>
-                            <div class="input-group">
-                                <button id="cancelNightButton" class="btn btn-danger" type="button" style="width: 250px; margin-top: 35px">Annuler la soirée</button>
-                            </div>
+                            <button id="cancelNightButton" class="btn btn-danger btn-block" type="button" style=" margin-top: 35px">Annuler la soirée</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div id="divGames" class="container" style="display: none;z-index: 100; margin-top: 150px;">
+    <div id="divGames" class="container" style="display: none;z-index: 100;">
         <div class="row">
             <div class="col-md-8">
                 <div class="panel-default panel panel-primary" style="margin-top: 250px">
-                    <div id="gamesTable" class="panel-body">
-
+                    <div class="panel-body">
+                        <table id="gamesTable" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Nom</th>
+                                <th>Description</th>
+                                <th>Min/Max</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Test</td>
+                                <td>Test</td>
+                                <td>Longueeeeee descriptionnnnnnnnnnn</td>
+                                <td>2/2</td>
+                                <td>button</td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -391,14 +406,30 @@
                                     <textarea id="gameDescription" class="form-control" placeholder="Décrivez votre jeu ici."
                                               name="gameDescription" type="text" rows=8 style="height: 100px"></textarea>
                                 </div>
-                                <div class="input-group" style="margin-top: 10px">
-                                    <label>Min</label>
-                                    <input id="gameMin" class="form-control" placeholder="0"
-                                           name="gameMin" type="text" style="width: 50px">
-                                    <label>Max</label>
-                                    <input id="gameMax" class="form-control" placeholder="0"
-                                           name="gameMax" type="text" style="width: 50px">
+                                <div>
+                                    <row>
+                                        <div class="col-md-6">
+                                            <div class="panel-default panel-primary">
+                                                <div class="panel-body">
+                                                    <label>Min</label>
+                                                    <input id="gameMin" class="form-control" placeholder="0"
+                                                           name="gameMin" type="text" style="width: 50px">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="panel-default panel-primary">
+                                                <div class="panel-body">
+                                                    <label>Max</label>
+                                                    <input id="gameMax" class="form-control" placeholder="0"
+                                                           name="gameMax" type="text" style="width: 50px">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </row>
                                 </div>
+                                    <button id="addGameButton" class="btn btn-success btn-block" type="button" style="margin-top: 15px">Ajouter</button>
+
                             </div>
                         </form>
                     </div>

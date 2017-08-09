@@ -22,19 +22,22 @@ $(document).ready(function() {
     })
 
     $('#displayGames').click(function () {
+        activeNavItem('game');
         toggleDiv('divGames');
     })
 
     $('#displayInvitations').click(function () {
+        activeNavItem('invite');
         toggleDiv('divInvitations');
     })
 
     $('#displayManagement').click(function () {
+        activeNavItem('management');
         toggleDiv('divManagement');
     })
 
     $('#displayNight').click(function () {
-
+        activeNavItem('night');
     })
 
 
@@ -64,6 +67,23 @@ function toggleDiv(divToDisplay) {
     $('#' + currentDisplay).attr('style', 'display:none');
     $('#' + divToDisplay).attr('style', 'display:block');
     $('#' + divToDisplay + " input:first").focus();
+}
+
+function activeNavItem(navItemToDisplay) {
+    var currentActive = getCurrentActiveNavItem()
+    $(currentActive).removeClass("active")
+    $('#' + navItemToDisplay).addClass("active");
+}
+
+function getCurrentActiveNavItem() {
+    var res;
+
+    $("#navbar li").each(function () {
+        if($(this).hasClass("active")) {
+            res = $(this);
+        }
+    });
+    return res;
 }
 
 function getCurrentDisplaySection() {

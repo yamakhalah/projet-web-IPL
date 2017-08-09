@@ -35,6 +35,16 @@ $(document).ready(function() {
 
 
 
+
+    $('#addUserEmailButton').click(function () {
+        var email = $('#section2emailInput').val()
+        $('#sectionCreate2Form').append('<div id="exempleCheckboxX" class="checkbox">\n' +
+            '<label><input type="checkbox" value="idInDBX" checked>'+email+'</label>\n' +
+            '</div>')
+    })
+
+
+
     $('#addGameButton').click(function () {
         $('#addGameButton').before('<div class="input-group" style="margin-bottom: 20px">' +
             '<select id="jsGameX" class="form-control">\n' +

@@ -284,7 +284,7 @@
                     </div>
                     <div class="panel-body">
                         <form id="exemple2" role="form">
-                            <div class="form-group">
+                            <div id="sectionCreate2Form" class="form-group">
                                 <label>Liste d'utilisateurs</label>
                                 <div id="exempleCheckbox1" class="checkbox">
                                     <label><input type="checkbox" value="idInDB1">Nom prenom</label>
@@ -296,7 +296,17 @@
                                     <label><input type="checkbox" value="idInDB3">Nom prenom</label>
                                 </div>
                             </div>
+                            <div class="input-group">
+                                <label>Inviter par email</label>
+                                <input id="section2emailInput" class="form-control" placeholder="uneAdresse@unFournisseur.com"
+                                       name="name" type="text">
+                                <button id="addUserEmailButton" class="btn btn-primary" type="button">Ajouter</button>
+                            </div>
+                            <div class="input-group">
+                                <button id="sendInvitesButton" class="btn btn-success" type="button" style="width: 250px; margin-top: 35px">Envoyer les invitations</button>
+                            </div>
                         </form>
+
                     </div>
                 </div>
             </div>

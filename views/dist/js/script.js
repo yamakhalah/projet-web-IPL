@@ -10,7 +10,7 @@ $(document).ready(function() {
         toggleDiv('divConnexion');
     });
     $('#createButton').click(function () {
-        toggleDiv('divManagement')
+        toggleSection('divManagement', 'sectionCreate1')
     })
 
     $('#displayGames').click(function () {
@@ -48,6 +48,13 @@ function toggleDiv(divToDisplay) {
     $('#' + divToDisplay + " input:first").focus();
 }
 
+function toggleSection(currentDiv, divToDisplay) {
+    var currentDisplay = getCurrentDisplayUnderSection();
+    $('#' + currentDisplay).attr('style', 'display:none');
+    $('#' + divToDisplay).attr('style', 'display:block');
+    $('#' + divToDisplay + " input:first").focus();
+}
+
 function getCurrentDisplaySection() {
     var res;
 
@@ -59,7 +66,7 @@ function getCurrentDisplaySection() {
     return res;
 }
 
-function getCurrentDisplayUnderSection(currentDiv, divToDisplay){
+function getCurrentDisplayUnderSection(currentDiv){
     $("currentDiv div[id^='section']").each(function() {
         if ($(this).css('display') == "block") {
             res = $(this).attr('id');

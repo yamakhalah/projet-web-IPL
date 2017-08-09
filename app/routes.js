@@ -1,10 +1,16 @@
 var fs = require('fs');
 var logger = require('../config/logger');
+var controllers = require('./controllers') // no need to put /index.js because it is the default file
 'use strict';
 
 // To check if a user is authenticated use
 // if (req.isAuthenticated())
 
+/**
+ * Export the module
+ * @param  {express} app     Instance of the express middleware
+ * @param  {passport} passport Instance of the passport middleware
+ */
 module.exports = function(app, passport) {
 
     app.get('/', function(req, res) {
@@ -17,6 +23,124 @@ module.exports = function(app, passport) {
         res.redirect('/');
     });
 
+    /****************************************
+     * All the routes linked to the Users ***
+     ***************************************/
+    // GET all the users
+    app.get('/users', function(req, res) {
+        var controller = controllers["user"]
+
+        controller.find(req.query, function(err, results) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            logger.info("GET Users : OK");
+            res.json({
+                confirmation: 'success',
+                results: results
+            })
+        })
+    });
+
+    // GET one user by ID
+    app.get('/user/:id', function(req, res) {
+        var id = req.params.id
+        var controller = controllers["user"]
+
+        controller.findById(id, function(err, result) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: 'Couldn\'t find the user'
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                confirmation: 'success',
+                result: result
+            })
+        })
+    });
+
+    
+    /****************************************
+     * All the routes linked to the Games ***
+     ***************************************/
+    // GET all games
+    app.get('/games', function(req, res) {
+        var controller = controllers["game"]
+
+        controller.find(req.query, function(err, results) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                confirmation: 'success',
+                results: results
+            })
+        })
+    });
+
+    // GET one game by ID
+    app.get('/game/:id', function(req, res) {
+        var id = req.params.id
+        var controller = controllers["game"]
+
+        controller.findById(id, function(err, result) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: 'Couldn\'t find the game'
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                confirmation: 'success',
+                result: result
+            })
+        })
+    });
+
+    // POST a game
+    app.post('/game', function(req, res, next) {
+        var controller = controllers["game"]
+
+        controller.create(req.body, function(err, result) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                confirmation: 'success',
+                result: result
+            })
+        })
+    })
+
+    /***************************************************
+     * All the routes linked to the Login and signup ***
+     **************************************************/
     // Login page
     app.get('/login', function(req, res) {
         var file = fs.readFileSync("./views/login.html", "UTF8");

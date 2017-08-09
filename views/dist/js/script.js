@@ -10,7 +10,11 @@ $(document).ready(function() {
         toggleDiv('divConnexion');
     });
     $('#createButton').click(function () {
-        toggleSection('divManagement', 'sectionCreate1')
+        toggleSectionManagement(1);
+    })
+
+    $('#validateNightButton').click(function () {
+        toggleSectionManagement(2);
     })
 
     $('#displayGames').click(function () {
@@ -48,13 +52,6 @@ function toggleDiv(divToDisplay) {
     $('#' + divToDisplay + " input:first").focus();
 }
 
-function toggleSection(currentDiv, divToDisplay) {
-    var currentDisplay = getCurrentDisplayUnderSection();
-    $('#' + currentDisplay).attr('style', 'display:none');
-    $('#' + divToDisplay).attr('style', 'display:block');
-    $('#' + divToDisplay + " input:first").focus();
-}
-
 function getCurrentDisplaySection() {
     var res;
 
@@ -66,12 +63,16 @@ function getCurrentDisplaySection() {
     return res;
 }
 
-function getCurrentDisplayUnderSection(currentDiv){
-    $("currentDiv div[id^='section']").each(function() {
-        if ($(this).css('display') == "block") {
-            res = $(this).attr('id');
-        }
-    });
-    return res;
+function toggleSectionManagement(type) {
+    if(type === 1){
+        $('#sectionCreate2').attr('style','display:none');
+        $('#sectionCreate1').attr('style', 'display:block');
+        $('#sectionCreateJeux').attr('style', 'display:block');
+    }else if(type === 2){
+        $('#sectionCreate1').attr('style','display:none');
+        $('#sectionCreateJeux').attr('style','display:none');
+        $('#sectionCreate2').attr('style', 'display:block');
+    }
 }
+
 

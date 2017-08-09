@@ -23,7 +23,7 @@
 <body>
 
     <!-- Fixed navbar -->
-    <nav id="navBarIndex" class="navbar navbar-default navbar-fixed-top">
+    <nav id="divNavBar" class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -175,7 +175,7 @@
         </div>
     </div>
 
-    <div id="divInvitations" class="container" style="display: block;z-index: 100; margin-top: 150px;">
+    <div id="divInvitations" class="container" style="display: none;z-index: 100; margin-top: 150px;">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <div class="panel-default panel panel-primary">
@@ -223,7 +223,7 @@
                     </div>
                 </div>
             </div>
-            <div id="sectionCreate1" class="col-md-5 col-md-offset-1">
+            <div id="sectionCreate1" class="col-md-5 col-md-offset-1" style="display: block">
                 <div class="panel panel-primary">
                     <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
                         <h3 class="panel-title"><b>Création</b></h3>
@@ -269,7 +269,10 @@
                                         <option>A IMPLEMENTER EN JS</option>
                                     </select>
                                 </div>
+                                <label><button id="validateNightButton" type="button" class="btn btn-success" style="width: 150px; margin-top: 20px">Valider et inviter</button></label>
                             </div>
+
+
                         </form>
                     </div>
                 </div>
@@ -280,20 +283,30 @@
                         <h3 class="panel-title"><b>Création</b></h3>
                     </div>
                     <div class="panel-body">
-
+                        <form id="exemple2" role="form">
+                            <div class="form-group">
+                                <label>Liste d'utilisateurs</label>
+                                <div id="exempleCheckbox1" class="checkbox">
+                                    <label><input type="checkbox" value="idInDB1">Nom prenom</label>
+                                </div>
+                                <div id="exempleCheckbox2" class="checkbox">
+                                    <label><input type="checkbox" value="idInDB2">Nom prenom</label>
+                                </div>
+                                <div id="exempleCheckbox3" class="checkbox">
+                                    <label><input type="checkbox" value="idInDB3">Nom prenom</label>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 text-center">
+            <div id="sectionCreateJeux"class="col-md-3 text-center" style="display: block">
                 <div class="panel panel-primary">
                     <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
                         <h3 class="panel-title"><b>Jeux</b></h3>
                     </div>
                     <div class="panel-body">
                         <form id="formJeux" role="form">
-                            <div class="form-group">
-                                <label><button id="addGameButton" type="button" class="btn btn-primary" style="width: 150px">Ajouter un jeu</button></label>
-                            </div>
                         </form>
                     </div>
                 </div>

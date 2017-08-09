@@ -13,6 +13,10 @@ $(document).ready(function() {
         toggleSectionManagement(1);
     })
 
+    $('#manageButton').click(function () {
+        toggleSectionManagement(3)
+    })
+
     $('#validateNightButton').click(function () {
         toggleSectionManagement(2);
     })
@@ -76,13 +80,20 @@ function getCurrentDisplaySection() {
 function toggleSectionManagement(type) {
     if(type === 1){
         $('#sectionCreate2').attr('style','display:none');
+        $('#sectionManage').attr('style','display:none');
         $('#sectionCreate1').attr('style', 'display:block');
         $('#sectionCreateJeux').attr('style', 'display:block');
     }else if(type === 2){
         $('#sectionCreate1').attr('style','display:none');
         $('#sectionCreateJeux').attr('style','display:none');
         $('#sectionCreate2').attr('style', 'display:block');
+    }else if(type === 3) {
+        $('#sectionCreate2').attr('style','display:none');
+        $('#sectionCreate1').attr('style','display:none');
+        $('#sectionCreateJeux').attr('style','display:none');
+        $('#sectionManage').attr('style', 'display:block');
     }
+
 }
 
 

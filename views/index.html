@@ -11,7 +11,7 @@
     <link href="./webapp/bootstrap/bootstrap.min.css" rel="stylesheet">
     <link href="./webapp/bootstrap/metisMenu.min.css" rel="stylesheet">
     <link href="./webapp/bootstrap/sb-admin-2.min.css" rel="stylesheet" type="text/css" />
-    <link href="./webapp/bootstrap/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- NOTIFY -->
     <link rel="stylesheet" type="text/css" href="./webapp/bootstrap/notify/animate.css"/> 
@@ -358,7 +358,7 @@
             <div class="col-md-8">
                 <div class="panel-default panel panel-primary" style="margin-top: 250px">
                     <div class="panel-body">
-                        <table id="gamesTable" class="table table-bordered">
+                        <table id="gamesTable" class="table table-bordered" style="width: 100%;">
                             <thead>
                             <tr>
                                 <th>Image</th>
@@ -369,13 +369,6 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td>Test</td>
-                                <td>Test</td>
-                                <td>Longueeeeee descriptionnnnnnnnnnn</td>
-                                <td>2/2</td>
-                                <td>button</td>
-                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -387,25 +380,25 @@
                         <h3 class="panel-title"><b>Ajouter un jeu</b></h3>
                     </div>
                     <div id="gamesForm" class="panel-body">
-                        <form id="addGameForm" role="form">
+                        <form id="addGameForm" role="form" method="POST" action="/game">
                             <div class="form-group">
                                 <label>Image</label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-image"></i></span>
                                     <input id="gamePicture" class="form-control" placeholder="jeu.jpg"
-                                           name="gamePicture" type="file" autofocus>
+                                           name="image" type="file" autofocus>
                                 </div>
                                 <label>Nom</label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-comment"></i></span>
                                     <input id="gameName" class="form-control" placeholder="Nom du jeu"
-                                           name="gameName" type="text">
+                                           name="name" type="text">
                                 </div>
                                 <label>Description</label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-file-text"></i></span>
                                     <textarea id="gameDescription" class="form-control" placeholder="Décrivez votre jeu ici."
-                                              name="gameDescription" type="text" rows=8 style="height: 100px"></textarea>
+                                              name="description" type="text" rows=8 style="height: 100px"></textarea>
                                 </div>
                                 <div>
                                     <row>
@@ -414,7 +407,7 @@
                                                 <div class="panel-body">
                                                     <label>Min</label>
                                                     <input id="gameMin" class="form-control" placeholder="0"
-                                                           name="gameMin" type="text" style="width: 50px">
+                                                           name="minPlayers" type="text" style="width: 50px">
                                                 </div>
                                             </div>
                                         </div>
@@ -423,13 +416,13 @@
                                                 <div class="panel-body">
                                                     <label>Max</label>
                                                     <input id="gameMax" class="form-control" placeholder="0"
-                                                           name="gameMax" type="text" style="width: 50px">
+                                                           name="maxPlayers" type="text" style="width: 50px">
                                                 </div>
                                             </div>
                                         </div>
                                     </row>
                                 </div>
-                                    <button id="addGameButton" class="btn btn-success btn-block" type="button" style="margin-top: 15px">Ajouter</button>
+                                    <button id="addGameButton" class="btn btn-success btn-block" type="submit" style="margin-top: 15px">Ajouter</button>
 
                             </div>
                         </form>

@@ -1,4 +1,5 @@
 var connected = false;
+var gamesTable;
 
 $(document).ready(function() {
     Init.all();
@@ -34,16 +35,6 @@ $(document).ready(function() {
             '</div>')
     })
 
-
-
-    $('#addGameButton').click(function () {
-        $('#addGameButton').before('<div class="input-group" style="margin-bottom: 20px">' +
-            '<select id="jsGameX" class="form-control">\n' +
-            '<option>A IMPLEMENTER EN JS</option>\n' +
-            '</select>' +
-            '</div>')
-    })
-
     $('#addNightGameButton').click(function () {
         $('#addNightGameButton').before('<div class="input-group" style="margin-bottom: 20px">' +
             '<select id="jsGameX" class="form-control">\n' +
@@ -57,6 +48,8 @@ $(document).ready(function() {
     $('#navJeux').click(function() {
         $('#section-jeux').attr('style', 'display:block');
     })
+
+    gamesHandler();
 
 });
 
@@ -110,6 +103,80 @@ var User = (function() {
         register: register
     }       
 })();
+
+//////////////////////////////////////////////////////
+///////////////// GAMES //////////////////////////////
+//////////////////////////////////////////////////////
+var gamesHandler = function() {
+    // Add a game
+    $("#addGameButton").on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: "/game",
+            type: "post",
+            data: formToJson("addGameForm"),
+            success: function(data, status, jqXHR) {
+                Utils.notifySucces("Jeu ajouté avec succès");
+                gamesTable.ajax.url("/games").load();
+            }, error: function(jqXHR, status, err) {
+                Utils.notifyError(status);
+            }
+        })
+    })
+
+    // List all games
+    gamesTable = $("#gamesTable").on("xhr.dt", function(e, settings, data) {
+        console.log(data);
+    })
+    .DataTable({
+        ajax: {
+            url: "/games",
+        },
+        rowId: "_id",
+        language: {
+            processing: "Chargement des données ...",
+            emptyTable: "Aucun jeu enregistré...",
+            lengthMenu: "Afficher _MENU_ entrées",
+            sInfo: "Affiche _START_ à _END_ de _TOTAL_ entrées",
+            paginate: {
+                next:       "Suivant",
+                previous:   "Précédent"
+            },
+            search: "Recherche:"
+        },
+        stateSave: true,
+        columns: [
+            {"data": "image", "visible": true, "orderable": false},
+            {"data": "name", "visible": true, "searchable": true},
+            {"data": null, "visible": true, "searchable": true},
+            {"data": null, "visible": true, "searchable": false},
+            {"data": null, "visible": true, "orderable": false}
+        ],
+        columnDefs: [
+            {
+                "render": function ( data, type, row ) {
+                    if (data.description) {
+                        return data.description;
+                    }
+                    return "";
+                },
+                "targets": 2
+            },
+            {
+                "render": function ( data, type, row ) {
+                    return data.minPlayers + ' / ' + data.maxPlayers;
+                },
+                "targets": 3
+            },
+            {
+                "render": function ( data, type, row ) {
+                    return '<button type="button" class="btn btn-default btn-sm"><i class="fa fa-trash"></i></button>';
+                },
+                "targets": 4
+            }
+        ]
+    });
+}
 
 
 function toggleSectionManagement(type) {
@@ -288,6 +355,9 @@ var formToJson = function(selector) {
     var data = {};
 
     $("#" + selector).find('input').each(function() {
+        data[$(this).attr('name')] = $(this).val();
+    });
+    $("#" + selector).find('textarea').each(function() {
         data[$(this).attr('name')] = $(this).val();
     });
     return data;

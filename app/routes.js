@@ -87,7 +87,7 @@ module.exports = function(app, passport) {
     app.get('/games', function(req, res) {
         var controller = controllers["game"]
 
-        controller.find(req.query, function(err, results) {
+        controller.find(null, function(err, results) {
             if (err) {
                 res.json({
                     confirmation: 'fail',
@@ -97,10 +97,9 @@ module.exports = function(app, passport) {
                 return
             }
 
-            res.json({
-                confirmation: 'success',
-                results: results
-            })
+            res.json(
+                {data: results}
+            )
         })
     });
 

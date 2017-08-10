@@ -1,6 +1,18 @@
-$(document).ready(function() {
+var connected = false;
 
+$(document).ready(function() {
     Init.all();
+
+    $.ajax({
+        url: "/isAuthenicated",
+        type: "get",
+        success: function(data, status, jqXHR) {
+            connected = true;
+            Init.navUser();
+        }, error: function(jqXHR, status, err) {
+            $("#divConnexion").show();
+        }
+    });
 
     $('#createButton').click(function () {
         toggleSectionManagement(1);
@@ -46,21 +58,51 @@ $(document).ready(function() {
         $('#section-jeux').attr('style', 'display:block');
     })
 
-
 });
 
 var User = (function() {
     function logIn() {
-        Utils.notifySucces("Connexion réussie");
-        Init.navUser();
-    }    
+        $.ajax({
+            url: "/login",
+            type: "post",
+            data: formToJson("formLogin"),
+            success: function(data, status, jqXHR) {
+                Utils.notifySucces("Connexion réussie");
+                connected = true;
+                Init.navUser();
+            }, error: function(jqXHR, status, err) {
+                Utils.notifyError(status);
+            }
+        })
+    }
 
     function logOut() {
-
+        $.ajax({
+            url: "/logout",
+            type: "get",
+            success: function(data, status, jqXHR) {
+                connected = false;
+                location.reload();
+            }, error: function(jqXHR, status, err) {
+                Utils.notifyError("Une erreur s'est produite: " + err);
+            }
+        })
     }
 
     function register() {
-
+        $.ajax({
+            url: "/signup",
+            type: "post",
+            data: formToJson("formInscription"),
+            success: function(data, status, jqXHR) {
+                Utils.notifySucces("Vous pouvez dès a présent vous connecter");
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            }, error: function(jqXHR, status, err) {
+                Utils.notifyError("Une erreur s'est produite: " + err);
+            }
+        })
     }
     return {
         logIn: logIn,
@@ -93,7 +135,6 @@ function toggleSectionManagement(type) {
 var Init = (function() {
     
     function all() {
-        $('#divConnexion').css('display', 'block');
         $('#butNotYetRegister').click(function() {
             Utils.toggleDiv('divInscription');
         });
@@ -103,6 +144,12 @@ var Init = (function() {
         $('#butLogIn').click(function() {
             User.logIn();
         });
+        $("#butRegister").click(function() {
+            User.register();
+        });
+        $("#disconnection").click(function() {
+            User.logOut();
+        })
         
         initClickEvents();
     }
@@ -114,15 +161,17 @@ var Init = (function() {
 
     // When the user log in
     function navUser() {
-        $('#divConnexion').attr('style','display:none');
-        $('#divNavBar').attr('style','display:block');
-        $('#divInvitations').attr('style','display:block');
+        if (connected) {
+            $('#divConnexion').attr('style','display:none');
+            $('#divNavBar').attr('style','display:block');
+            $('#divInvitations').attr('style','display:block');
+        }
     }
 
     function initNav() {
         $('#navbar li a').each(function(index, element) {
             if (element.id === "disconnection") {
-                // TODO traitement déconnexion
+                
             } else {
                 $(element).click(function() {
                     var idDiv = "div" + element.id.substring(7);
@@ -234,3 +283,12 @@ var Utils = (function() {
         notifyError: notifyError
     }
 })();
+
+var formToJson = function(selector) {
+    var data = {};
+
+    $("#" + selector).find('input').each(function() {
+        data[$(this).attr('name')] = $(this).val();
+    });
+    return data;
+}

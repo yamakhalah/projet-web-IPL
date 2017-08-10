@@ -23,6 +23,15 @@ module.exports = function(app, passport) {
         res.redirect('/');
     });
 
+    app.get('/isAuthenicated', function(req, res) {
+        if (req.isAuthenticated()) {
+            logger.info("oui");
+            res.status(200).send({ success: "logged in" });
+        } else {
+            res.status(400).send({ error: "not logged in" });
+        }
+    })
+
     /****************************************
      * All the routes linked to the Users ***
      ***************************************/

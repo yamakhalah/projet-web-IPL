@@ -32,6 +32,15 @@ $(document).ready(function() {
             '</div>')
     })
 
+    $('#addNightGameButton').click(function () {
+        $('#addNightGameButton').before('<div class="input-group" style="margin-bottom: 20px">' +
+            '<select id="jsGameX" class="form-control">\n' +
+            '<option>A IMPLEMENTER EN JS</option>\n' +
+            '</select>' +
+            '</div>')
+    })
+
+
 
     $('#navJeux').click(function() {
         $('#section-jeux').attr('style', 'display:block');

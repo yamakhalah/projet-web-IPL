@@ -119,8 +119,7 @@ module.exports = function(app, passport) {
             }
 
             res.json({
-                confirmation: 'success',
-                result: result
+                data: result
             })
         })
     });
@@ -140,8 +139,7 @@ module.exports = function(app, passport) {
             }
 
             res.json({
-                confirmation: 'success',
-                result: result
+                data: result
             })
         })
     })

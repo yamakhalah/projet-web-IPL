@@ -39,7 +39,7 @@ module.exports = function(app, passport) {
     app.get('/users', function(req, res) {
         var controller = controllers["user"]
 
-        controller.find(req.query, function(err, results) {
+        controller.find(null, function(err, results) {
             if (err) {
                 res.json({
                     confirmation: 'fail',
@@ -52,7 +52,7 @@ module.exports = function(app, passport) {
             logger.info("GET Users : OK");
             res.json({
                 confirmation: 'success',
-                results: results
+                data: results
             })
         })
     });

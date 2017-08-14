@@ -50,8 +50,49 @@ $(document).ready(function() {
     })
 
     gamesHandler();
-
+    gameNightHandler();
 });
+
+var gameNightHandler = function() {
+    $(".clockpicker").clockpicker({
+        autoclose: 'true',
+        align: "left"
+    });
+
+    $("#invite-guests-table").on("xhr.dt", function(e, settings, data) {
+    })
+    .DataTable({
+        ajax: {
+            url: "/users",
+        },
+        rowId: "_id",
+        language: {
+            processing: "Chargement des données ...",
+            emptyTable: "Aucun utilisateur enregistré...",
+            lengthMenu: "Afficher _MENU_ entrées",
+            sInfo: "Affiche _START_ à _END_ de _TOTAL_ entrées",
+            paginate: {
+                next:       "Suivant",
+                previous:   "Précédent"
+            },
+            search: "Recherche:"
+        },
+        stateSave: true,
+        columns: [
+            {"data": null, "visible": true, "orderable": false},
+            {"data": "firstname", "visible": true, "searchable": true},
+            {"data": "lastname", "visible": true, "searchable": true}
+        ],
+        columnDefs: [
+            {
+                "render": function ( data, type, row ) {
+                    return "<input type='checkbox' id='" + data._id + "'/>";
+                },
+                "targets": 0
+            }
+        ]
+    });
+}
 
 var User = (function() {
     function logIn() {

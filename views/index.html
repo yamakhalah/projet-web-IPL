@@ -17,6 +17,7 @@
     <link rel="stylesheet" type="text/css" href="./webapp/bootstrap/notify/animate.css"/> 
     <!-- DATATABLES -->
     <link rel="stylesheet" type="text/css" href="./webapp/bootstrap/dataTables/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./webapp/dist/css/clockpicker.css">
 
 </head>
 
@@ -258,16 +259,12 @@
                                 <label>Début</label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-hourglass"></i></span>
-                                    <select id="jsHourBegin" class="form-control">
-                                        <option>A IMPLEMENTER EN JS</option>
-                                    </select>
+                                    <input type="text" name="startTime" id="startTime" class="form-control clockpicker">
                                 </div>
                                 <label>Fin</label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-hourglass"></i></span>
-                                    <select id="jsHourEnd" class="form-control">
-                                        <option>A IMPLEMENTER EN JS</option>
-                                    </select>
+                                    <input type="text" name="endTime" id="endTime" class="form-control clockpicker">
                                 </div>
                                 <button id="validateNightButton" type="button" class="btn btn-success btn-block" style=" margin-top: 20px">Valider et inviter</button>
                             </div>
@@ -277,7 +274,7 @@
                     </div>
                 </div>
             </div>
-            <div id="sectionCreate2" class="col-md-5 col-md-offset-1" style="display: none">
+            <div id="sectionCreate2" class="col-md-6" style="display: none">
                 <div class="panel panel-primary" style="margin-top: 100px">
                     <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
                         <h3 class="panel-title"><b>Création</b></h3>
@@ -286,15 +283,16 @@
                         <form id="exemple2" role="form">
                             <div id="sectionCreate2Form" class="form-group">
                                 <label>Liste d'utilisateurs</label>
-                                <div id="exempleCheckboxA1" class="checkbox">
-                                    <label><input type="checkbox" value="idInDB1">Nom prenom</label>
-                                </div>
-                                <div id="exempleCheckboxA2" class="checkbox">
-                                    <label><input type="checkbox" value="idInDB2">Nom prenom</label>
-                                </div>
-                                <div id="exempleCheckboxA3" class="checkbox">
-                                    <label><input type="checkbox" value="idInDB3">Nom prenom</label>
-                                </div>
+                                <table class="table table-bordered" id="invite-guests-table" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Nom</th>
+                                            <th>Prénom</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
                             </div>
                             <label>Inviter par email</label>
                             <div class="form-group">
@@ -469,6 +467,7 @@
     <script src="./webapp/bootstrap/dataTables/js/dataTables.bootstrap.min.js" type="text/javascript"></script>
 
 
+    <script src="./webapp/dist/js/clockpicker.js"></script>
     <script src="./webapp/dist/js/script.js"></script>
 
 </body>

@@ -172,4 +172,49 @@ module.exports = function(app, passport) {
         failureRedirect : '/',
         failureFlash : true 
     }));
+
+    /****************************************
+     * All the routes linked to the Nights **
+     ***************************************/
+    // GET all nights of a host
+    app.get('/nights/:host_id', function(req, res) {
+        var controller = controllers["night"]
+
+        controller.find(host_id, function(err, results) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: "Couldn't find any games with that host_id : " + host_id
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                data: results
+            })
+        })
+    });
+
+     // POST to change nights status
+    app.post('/nights/:id', function(req, res) {
+        var controller = controllers["night"]
+
+        controller.update(id, req.body, function(err, results) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: "Couldn't update this night : " + id
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                data: results
+            })
+        })
+    });
 };
+
+    

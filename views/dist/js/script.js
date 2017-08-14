@@ -53,37 +53,46 @@ $(document).ready(function() {
     gameNightHandler();
 });
 
+// Add here the methods and events that should happen after the user is connected
+var functionsAfterConnection = function() {
+
+}
+
 var gameNightHandler = function() {
     $(".clockpicker").clockpicker({
         autoclose: 'true',
         align: "left"
     });
 
-    $("#invite-guests-table").on("xhr.dt", function(e, settings, data) {
-    })
-    .DataTable({
-        ajax: {
-            url: "/users",
-        },
-        rowId: "_id",
-        language: {
-            processing: "Chargement des données ...",
-            emptyTable: "Aucun utilisateur enregistré...",
-            lengthMenu: "Afficher _MENU_ entrées",
-            sInfo: "Affiche _START_ à _END_ de _TOTAL_ entrées",
-            paginate: {
-                next:       "Suivant",
-                previous:   "Précédent"
+    // List of games to add to games-night
+    var playableGamesColumns = [
+            {"data": null, "visible": true, "orderable": false},
+            {"data": "name", "visible": true, "searchable": true},
+            {"data": null, "visible": true, "searchable": true}
+        ];
+    var playableGamesColumnDefs = [
+            {
+                "render": function ( data, type, row ) {
+                    return "<input type='checkbox' id='" + data._id + "'/>";
+                },
+                "targets": 0
             },
-            search: "Recherche:"
-        },
-        stateSave: true,
-        columns: [
+            {
+                "render": function (data, type, row) {
+                    return data.minPlayers + " / " + data.maxPlayers
+                },
+                "targets": 2
+            }
+        ]
+    initDatatable("playable-games-table", "/games", playableGamesColumns, playableGamesColumnDefs);
+
+    // List of possible guests
+    var guestTableColumns = [
             {"data": null, "visible": true, "orderable": false},
             {"data": "firstname", "visible": true, "searchable": true},
             {"data": "lastname", "visible": true, "searchable": true}
-        ],
-        columnDefs: [
+        ];
+    var guestTableColumnDefs = [
             {
                 "render": function ( data, type, row ) {
                     return "<input type='checkbox' id='" + data._id + "'/>";
@@ -91,7 +100,7 @@ var gameNightHandler = function() {
                 "targets": 0
             }
         ]
-    });
+    initDatatable("invite-guests-table", "/users", guestTableColumns, guestTableColumnDefs);
 }
 
 var User = (function() {
@@ -107,6 +116,8 @@ var User = (function() {
             }, error: function(jqXHR, status, err) {
                 Utils.notifyError(status);
             }
+        }).done(function() {
+            functionsAfterConnection();
         })
     }
 
@@ -166,34 +177,14 @@ var gamesHandler = function() {
     })
 
     // List all games
-    gamesTable = $("#gamesTable").on("xhr.dt", function(e, settings, data) {
-        console.log(data);
-    })
-    .DataTable({
-        ajax: {
-            url: "/games",
-        },
-        rowId: "_id",
-        language: {
-            processing: "Chargement des données ...",
-            emptyTable: "Aucun jeu enregistré...",
-            lengthMenu: "Afficher _MENU_ entrées",
-            sInfo: "Affiche _START_ à _END_ de _TOTAL_ entrées",
-            paginate: {
-                next:       "Suivant",
-                previous:   "Précédent"
-            },
-            search: "Recherche:"
-        },
-        stateSave: true,
-        columns: [
+    var gamesColumns = [
             {"data": "image", "visible": true, "orderable": false},
             {"data": "name", "visible": true, "searchable": true},
             {"data": null, "visible": true, "searchable": true},
             {"data": null, "visible": true, "searchable": false},
             {"data": null, "visible": true, "orderable": false}
-        ],
-        columnDefs: [
+        ];
+    var gamesColumnDefs = [
             {
                 "render": function ( data, type, row ) {
                     if (data.description) {
@@ -215,8 +206,8 @@ var gamesHandler = function() {
                 },
                 "targets": 4
             }
-        ]
-    });
+        ];
+    gamesTable = initDatatable("gamesTable", "/games", gamesColumns, gamesColumnDefs);
 }
 
 
@@ -402,4 +393,29 @@ var formToJson = function(selector) {
         data[$(this).attr('name')] = $(this).val();
     });
     return data;
+}
+
+var initDatatable = function(tableId, route, columns, columnDefs) {
+    return $("#" + tableId).on("xhr.dt", function(e, settings, data) {
+    })
+    .DataTable({
+        ajax: {
+            url: route,
+        },
+        rowId: "_id",
+        language: {
+            processing: "Chargement des données ...",
+            emptyTable: "Aucun utilisateur enregistré...",
+            lengthMenu: "Afficher _MENU_ entrées",
+            sInfo: "Affiche _START_ à _END_ de _TOTAL_ entrées",
+            paginate: {
+                next:       "Suivant",
+                previous:   "Précédent"
+            },
+            search: "Recherche:"
+        },
+        stateSave: true,
+        columns: columns,
+        columnDefs: columnDefs
+    });
 }

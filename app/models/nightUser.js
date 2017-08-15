@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var nightUserSchema = mongoose.Schema({
-    hostId : String,
+    nightId : String,
     userId : String
 });
 

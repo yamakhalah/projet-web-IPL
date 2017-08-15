@@ -39,7 +39,7 @@ module.exports = function(app, passport) {
     app.get('/users', function(req, res) {
         var controller = controllers["user"]
 
-        controller.find(req.query, function(err, results) {
+        controller.find(null, function(err, results) {
             if (err) {
                 res.json({
                     confirmation: 'fail',
@@ -52,7 +52,7 @@ module.exports = function(app, passport) {
             logger.info("GET Users : OK");
             res.json({
                 confirmation: 'success',
-                results: results
+                data: results
             })
         })
     });
@@ -172,4 +172,80 @@ module.exports = function(app, passport) {
         failureRedirect : '/',
         failureFlash : true 
     }));
+
+    /****************************************
+     * All the routes linked to the Nights **
+     ***************************************/
+    // GET all nights of a host
+    app.get('/nights/:host_id', function(req, res) {
+        var controller = controllers["night"]
+
+        controller.find(host_id, function(err, results) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: "Couldn't find any games with that host_id : " + host_id
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                data: results
+            })
+        })
+    });
+
+     // POST to change nights status
+    app.post('/nights/:id', function(req, res) {
+        var controller = controllers["night"]
+
+        controller.update(id, req.body, function(err, results) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: "Couldn't update this night : " + id
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                data: results
+            })
+        })
+    });
+
+    // Fetch the nights to which the connected user was invited
+    app.get('/night-users', function(req, res) {
+        var controller = controllers["night-user"]
+
+        controller.find(req.user._id, function(err, results) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: "Couldn't find any users with the id : " + req.user._id
+                })
+                logger.info(err)
+                return
+            }
+
+            controller = controllers["night"];
+            let toReturn = {}
+            for (let result in results) {
+                controller.findById(result.nightId, function(err, night) {
+                    if (err) {
+                        logger.info("The night with the id: " + result.nightId + " could not be found");
+                    }
+                    toReturn[night._id] = night;
+                })
+            }
+
+            res.json({
+                data: toReturn
+            })
+        })
+    });
 };
+
+    

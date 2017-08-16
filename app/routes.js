@@ -1,6 +1,7 @@
 var fs = require('fs');
 var logger = require('../config/logger');
 var controllers = require('./controllers') // no need to put /index.js because it is the default file
+var mongoose = require('mongoose');
 'use strict';
 
 // To check if a user is authenticated use
@@ -239,9 +240,8 @@ module.exports = function(app, passport) {
     // Fetch the nights to which the connected user was invited
     app.get('/user-nights', function(req, res) {
         var controller = controllers["night"]
-        logger.info(req.user._id)
 
-        controller.find(req.user._id, function(err, results) {
+        controller.find(req.user._id.toString(), function(err, nights) {
             if (err) {
                 res.json({
                     confirmation: 'fail',
@@ -251,9 +251,38 @@ module.exports = function(app, passport) {
                 return
             }
 
-            res.json({
-                data: results
-            })
+            var i = 0;
+            
+            var toReturn = new Array();
+            controller = controllers["game"]
+            for (let night of nights) {
+
+                let ids = new Array();
+                for (let game of night.games) {
+                    ids.push(mongoose.Types.ObjectId(game.id));
+                }
+
+                controller.find({
+                    '_id' : {$in : ids}
+                }, function(err, games) {
+                    toReturn.push({
+                        'hostId' : night['hostId'],
+                        'date' : night['date'],
+                        'startTime' : night['startTime'],
+                        'endTime' : night['endTime'],
+                        'description' : night['description'],
+                        'status' : night['status'],
+                        'games' : games
+                    })
+
+                    i++;
+                    if (i == nights.length-1) {
+                        res.json({
+                            data: toReturn
+                        })
+                    }
+                })
+            }
         })
     });
 };

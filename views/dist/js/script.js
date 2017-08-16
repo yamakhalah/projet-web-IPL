@@ -64,7 +64,49 @@ $(document).ready(function() {
 
 // Add here the methods and events that should happen after the user is connected
 var functionsAfterConnection = function() {
-
+    // List all the nights to which the connected user has been invited to
+    var nightsColumns = [
+            {"data": null, "visible": true, "orderable": false},
+            {"data": "description", "visible": true, "searchable": true},
+            {"data": null, "visible": true},
+            {"data": null, "visible": true},
+            {"data": null, "visible": true}
+        ];
+    var nightsColumnDefs = [
+            {
+                "render": function ( data, type, row ) {
+                    var date = moment(data.date)
+                    return date.format("DD / MM / YYYY");
+                },
+                "targets": 0
+            },
+            {
+                "render": function (data, type, row) {
+                    var startTime = moment(data.startTime);
+                    var endTime = moment(data.endTime);
+                    return startTime.format("HH:mm") + " - " + endTime.format("HH:mm")
+                },
+                "targets": 2
+            },
+            {
+                "render": function (data, type, row) {
+                    var toReturn = "<ul>";
+                    for (var game of data.games) {
+                        toReturn += "<li>" + game.name + "</li>"
+                    }
+                    toReturn += "</ul>";
+                    return toReturn
+                },
+                "targets": 3
+            },
+            {
+                "render": function (data, type, row) {
+                    return "<button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> Valider</button>"
+                },
+                "targets": 4
+            }
+        ]
+    initDatatable("invitations-table", "/user-nights", nightsColumns, nightsColumnDefs);
 }
 
 var gameNightHandler = function() {

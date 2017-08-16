@@ -218,7 +218,7 @@ module.exports = function(app, passport) {
 
     // Fetch the nights to which the connected user was invited
     app.get('/night-users', function(req, res) {
-        var controller = controllers["night-user"]
+        var controller = controllers["night"]
 
         controller.find(req.user._id, function(err, results) {
             if (err) {
@@ -230,19 +230,8 @@ module.exports = function(app, passport) {
                 return
             }
 
-            controller = controllers["night"];
-            let toReturn = {}
-            for (let result in results) {
-                controller.findById(result.nightId, function(err, night) {
-                    if (err) {
-                        logger.info("The night with the id: " + result.nightId + " could not be found");
-                    }
-                    toReturn[night._id] = night;
-                })
-            }
-
             res.json({
-                data: toReturn
+                data: results
             })
         })
     });

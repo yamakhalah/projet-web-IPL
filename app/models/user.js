@@ -6,6 +6,10 @@ var userSchema = mongoose.Schema({
     lastname : String,
     email : String,
     password : String,
+    organisedNights: [{
+        id: String,
+        isValidated: Boolean
+    }]
 });
 
 // Functions used for passport

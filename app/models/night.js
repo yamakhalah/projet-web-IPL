@@ -6,7 +6,15 @@ var nightSchema = mongoose.Schema({
     startTime : Date,
     endTime : Date,
     description : String,
-    status : String
+    status : String,
+    guests : [{
+        id : String,
+        isValidated : Boolean
+    }],
+    games : [{
+        id : String,
+        nbParticipants : Number
+    }]
 });
 
 module.exports = mongoose.model('Night', nightSchema);

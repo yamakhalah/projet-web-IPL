@@ -8,8 +8,5 @@ var UserController = require('./UserController')
 module.exports = {
     night: NightController,
     game: GameController,
-    "night-game": NightGameController,
-    "night-game-user": NightGameUserController,
-    "night-user": NightUserController,
     user: UserController,
 }

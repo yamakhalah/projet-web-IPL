@@ -3,6 +3,7 @@ var gamesTable;
 
 $(document).ready(function() {
     Init.all();
+    Init.navUser();
 
     $.ajax({
         url: "/isAuthenicated",
@@ -49,13 +50,13 @@ $(document).ready(function() {
         $('#section-jeux').attr('style', 'display:block');
     })
 
-    for(var i=0; i<24;i++){
-        for(var j=0; j<60; j+5){
-            var option = i+'H'+j;
-            $('#jsHourBegin').append('<option>'+option+'</option>')
-            $('#jsHourEnd').append('<option>'+option+'</option>')
-        }
-    }
+    // for(var i=0; i<24;i++){
+    //     for(var j=0; j<60; j+5){
+    //         var option = i+'H'+j;
+    //         $('#jsHourBegin').append('<option>'+option+'</option>')
+    //         $('#jsHourEnd').append('<option>'+option+'</option>')
+    //     }
+    // }
 
     gamesHandler();
     gameNightHandler();
@@ -109,6 +110,54 @@ var gameNightHandler = function() {
             }
         ]
     initDatatable("invite-guests-table", "/users", guestTableColumns, guestTableColumnDefs);
+
+    // Create night 
+    $("#sendInvitesButton").on('click', function() {
+        var night = formToJson('formCreation');
+        var date = moment(night['date'], 'DD/MM/YYYY');
+
+        night['date'] = new Date(date.valueOf());
+        night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
+        night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0000 2017");
+
+        // Fetch the games chosen for the night
+        var games = new Array();
+        var i = 0;
+        $("#playable-games-table").find("input:checked").each(function() {
+            var tr = $(this).closest('tr');
+            games[i] = {
+                id : tr.attr('id'),
+                nbParticipants : 0
+            }
+            i++;
+        });
+
+        // Fetch the guests to invite
+        var guests = new Array();
+        i = 0;
+        $("#invite-guests-table").find("input:checked").each(function() {
+            var tr = $(this).closest('tr');
+            guests[i] = {
+                id : tr.attr('id'),
+                isValidated : false
+            }
+            i++;
+        });
+
+        night['games'] = games;
+        night['guests'] = guests;
+        
+        $.ajax({
+            url: "/night",
+            type: "post",
+            data: night,
+            success: function(data, status, jqXHR) {
+                Utils.notifySucces("La soirée a bien été créée");
+            }, error: function(jqXHR, status, err) {
+                Utils.notifyError(status);
+            }
+        });
+    })
 }
 
 var User = (function() {

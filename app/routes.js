@@ -216,9 +216,30 @@ module.exports = function(app, passport) {
         })
     });
 
-    // Fetch the nights to which the connected user was invited
-    app.get('/night-users', function(req, res) {
+    // POST a night
+    app.post('/night', function(req, res, next) {
         var controller = controllers["night"]
+
+        controller.create(req.body, function(err, result) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                data: result
+            })
+        })
+    })
+
+    // Fetch the nights to which the connected user was invited
+    app.get('/user-nights', function(req, res) {
+        var controller = controllers["night"]
+        logger.info(req.user._id)
 
         controller.find(req.user._id, function(err, results) {
             if (err) {

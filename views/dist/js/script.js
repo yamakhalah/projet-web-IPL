@@ -18,14 +18,17 @@ $(document).ready(function() {
 
     $('#createButton').click(function () {
         toggleSectionManagement(1);
+        CheckInputForm.clearFormCreation();
     })
 
     $('#manageButton').click(function () {
-        toggleSectionManagement(3)
+        toggleSectionManagement(3);
     })
 
     $('#validateNightButton').click(function () {
-        toggleSectionManagement(2);
+    	if ($('#formCreation').valid()) {
+        	toggleSectionManagement(2);
+    	}
     });
 
 
@@ -203,20 +206,24 @@ var gameNightHandler = function() {
 
 var User = (function() {
     function logIn() {
-        $.ajax({
-            url: "/login",
-            type: "post",
-            data: formToJson("formLogin"),
-            success: function(data, status, jqXHR) {
-                Utils.notifySucces("Connexion réussie");
-                connected = true;
-                Init.navUser();
-            }, error: function(jqXHR, status, err) {
-                Utils.notifyError(status);
-            }
-        }).done(function() {
-            functionsAfterConnection();
-        })
+		if (! $('#formLogin').valid()) {
+			return;
+		} else {
+	        $.ajax({
+	            url: "/login",
+	            type: "post",
+	            data: formToJson("formLogin"),
+	            success: function(data, status, jqXHR) {
+	                Utils.notifySucces("Connexion réussie");
+	                connected = true;
+	                Init.navUser();
+	            }, error: function(jqXHR, status, err) {
+	                Utils.notifyError(status);
+	            }
+	        }).done(function() {
+	            functionsAfterConnection();
+	        })
+	    }
     }
 
     function logOut() {
@@ -233,19 +240,23 @@ var User = (function() {
     }
 
     function register() {
-        $.ajax({
-            url: "/signup",
-            type: "post",
-            data: formToJson("formInscription"),
-            success: function(data, status, jqXHR) {
-                Utils.notifySucces("Vous pouvez dès a présent vous connecter");
-                setTimeout(function() {
-                    location.reload();
-                }, 1000);
-            }, error: function(jqXHR, status, err) {
-                Utils.notifyError("Une erreur s'est produite: " + err);
-            }
-        })
+    	if (! $('#formInscription').valid()) {
+    		return;
+    	} else {
+    		$.ajax({
+	            url: "/signup",
+	            type: "post",
+	            data: formToJson("formInscription"),
+	            success: function(data, status, jqXHR) {
+	                Utils.notifySucces("Vous pouvez dès a présent vous connecter");
+	                setTimeout(function() {
+	                    location.reload();
+	                }, 1000);
+	            }, error: function(jqXHR, status, err) {
+	                Utils.notifyError("Une erreur s'est produite: " + err);
+	            }
+	        })
+    	} 
     }
     return {
         logIn: logIn,
@@ -261,17 +272,21 @@ var gamesHandler = function() {
     // Add a game
     $("#addGameButton").on('click', function(e) {
         e.preventDefault();
-        $.ajax({
-            url: "/game",
-            type: "post",
-            data: formToJson("addGameForm"),
-            success: function(data, status, jqXHR) {
-                Utils.notifySucces("Jeu ajouté avec succès");
-                gamesTable.ajax.url("/games").load();
-            }, error: function(jqXHR, status, err) {
-                Utils.notifyError(status);
-            }
-        })
+        if (! $('#addGameForm').valid()) {
+        	return;
+        } else {
+			$.ajax({
+	            url: "/game",
+	            type: "post",
+	            data: formToJson("addGameForm"),
+	            success: function(data, status, jqXHR) {
+	                Utils.notifySucces("Jeu ajouté avec succès");
+	                gamesTable.ajax.url("/games").load();
+	            }, error: function(jqXHR, status, err) {
+	                Utils.notifyError(status);
+	            }
+        	})
+        }
     })
 
     // List all games
@@ -328,15 +343,207 @@ function toggleSectionManagement(type) {
 
 }
 
+var CheckInputForm = (function() {
+
+	// Private attributes
+	var validatorFormInscription;
+	var validatorFormLogin;
+	var validatorFormCreation;
+	var validatorAddGameForm;
+	// Form validation
+	var validationFormLogin = {
+		rules: {
+			email: {
+				required: true,
+				email: true,
+				maxlength: 255
+			},
+			password: {
+				required: true,
+				maxlength: 35
+			}
+		},
+		messages: {
+			email: {
+				required: "Veuillez indiquer votre email",
+				email: "Email incorrect"
+			},
+			password: "Veuillez indiquer votre mot de passe"
+		}
+	};
+
+	var validationFormInscription = {
+		rules: {
+                lastname: {
+                    required: true,
+                    maxlength: 35
+                },
+                firstname: {
+                    required: true,
+                    maxlength: 35
+                },
+                email: {
+                    required: true,
+                    email: true,
+                    maxlength: 255
+                },
+                password: {
+                    required: true
+                },
+                passwordConfirmation: {
+                    required: true,
+                    equalTo: "#insc-password"
+                }
+        },
+        messages: {
+                lastname: "Veuillez indiquer votre nom",
+                firstname: "Veuillez indiquer votre prénom",
+                email: "L'email est invalide",
+                password: "Veuillez indiquer votre mot de passe",
+                passwordConfirmation: {
+                	required: "",
+                	equalTo: "Les deux mots de passes ne correspondent pas"
+                }
+        }
+	};
+
+	var validationFormCreation = {
+		rules: {
+                name: {
+                    required: true,
+                    maxlength: 35
+                },
+                date: {
+                    required: true,
+                    maxlength: 35
+                },
+                description: {
+                    maxlength: 1000
+                },
+                startTime: {
+                    required: true
+                },
+                endTime: {
+                    required: true                }
+        },
+        messages: {
+                name: "Veuillez indiquer le nom de la soirée",
+                date: "Veuillez indiquer la date de la soirée",
+                description: "La description ne peut dépasser 1000 caractères",
+                startTime: {
+                	required: "Veuillez indiquer l'heure de départ"
+                },
+                endTime: "Veuillez indiquer l'heure de fin"
+        }
+	}
+
+	var validationAddGameForm = {
+		rules: {
+                name: {
+                    required: true,
+                    maxlength: 35
+                },
+                description: {
+                	required: true,
+                    maxlength: 1000
+                },
+                minPlayers: {
+                    required: true, 
+                    number: true
+                },
+                maxPlayers: {
+                    required: true,
+                    number : true
+                }
+        },
+        messages: {
+                name: "Veuillez indiquer le nom de la soirée",
+                description: {
+                	required: "Veuillez indiquer une description",
+                	maxlength: "La description ne peut dépasser 1000 caractères"
+                },
+                minPlayers: {
+                	required: "Veuillez indiquer le nombre minimum de joueurs",
+                	number: "Format incorrect"
+                },
+                maxPlayers: {
+                	required: "Veuillez indiquer le nombre maximum de joueurs",
+                	number: "Format incorrect"
+                }
+        }
+	}
+
+	function initValidatorPlugin() {
+		// override jquery validate plugin defaults
+		$.validator.setDefaults({
+		    highlight: function(element) {
+		        $(element).closest('.form-group').addClass('has-error');
+		    },
+		    unhighlight: function(element) {
+		        $(element).closest('.form-group').removeClass('has-error');
+		    },
+		    errorElement: 'span',
+		    errorClass: 'help-block',
+		    errorPlacement: function(error, element) {
+		        if(element.parent('.input-group').length) {
+		            error.insertAfter(element.parent());
+		        } else {
+		            error.insertAfter(element);
+		        }
+    		}
+		});
+	}
+
+	function initAllValidatorForm() {
+		validatorFormLogin = $('#formLogin').validate(validationFormLogin);
+		validatorFormInscription = $('#formInscription').validate(validationFormInscription);
+		validatorFormCreation = $('#formCreation').validate(validationFormCreation);
+		validatorAddGameForm = $('#addGameForm').validate(validationAddGameForm);
+	}
+
+	// Clear Form
+	function clearFormLogin() {
+		$('#formLogin').find(':input').val('');
+		validatorFormLogin.resetForm();
+	}
+
+	function clearFormInscription() {
+		$('#formInscription').find(':input').val('');
+		validatorFormInscription.resetForm();
+	}
+
+	function clearFormCreation() {
+		$('#formCreation').find(':input').val('');
+		validatorFormCreation.resetForm();
+	}
+
+	function clearAddGameForm() {
+		$('#addGameForm').find(':input').val('');
+		validatorAddGameForm.resetForm();
+	}
+
+
+	return {
+		initValidatorPlugin: initValidatorPlugin,
+		initAllValidatorForm: initAllValidatorForm,
+		clearFormLogin: clearFormLogin,
+		clearFormInscription: clearFormInscription,
+		clearFormCreation: clearFormCreation,
+		clearAddGameForm: clearAddGameForm
+	}
+})();
+
 // Visual + Click event
 var Init = (function() {
     
     function all() {
         $('#butNotYetRegister').click(function() {
             Utils.toggleDiv('divInscription');
+            CheckInputForm.clearFormInscription();
         });
         $('#butRegisterReturn').click(function() {
             Utils.toggleDiv('divConnexion');
+            CheckInputForm.clearFormLogin();
         });
         $('#butLogIn').click(function() {
             User.logIn();
@@ -346,7 +553,10 @@ var Init = (function() {
         });
         $("#disconnection").click(function() {
             User.logOut();
-        })
+        });
+
+        CheckInputForm.initValidatorPlugin();
+        CheckInputForm.initAllValidatorForm();
         
         initClickEvents();
     }
@@ -374,6 +584,12 @@ var Init = (function() {
                     var idDiv = "div" + element.id.substring(7);
                     Utils.toggleDiv(idDiv);
                     Utils.activeNavItem($(element).parent().attr('id'));
+
+                    if (element.id === "displayManagement") {
+                    	CheckInputForm.clearFormCreation();
+                    } else if (element.id === "displayGames") {
+                    	CheckInputForm.clearAddGameForm();
+                    } 
                 })
             }
         })

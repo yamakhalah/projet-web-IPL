@@ -79,7 +79,6 @@ module.exports = function(app, passport) {
             })
         })
     });
-
     
     /****************************************
      * All the routes linked to the Games ***
@@ -177,11 +176,13 @@ module.exports = function(app, passport) {
     /****************************************
      * All the routes linked to the Nights **
      ***************************************/
-    // GET all nights of a host
-    app.get('/nights/:host_id', function(req, res) {
-        var controller = controllers["night"]
+    // GET all nights of a host (TO CONTINUE (Gaby))
+   /* app.get('/nights/:host_id', function(req, res) {
+        var controller = controllers["user"]
 
-        controller.find(host_id, function(err, results) {
+        // 1) Retrieve the user
+        controller.findById(host_id, function(err, result) {
+
             if (err) {
                 res.json({
                     confirmation: 'fail',
@@ -191,11 +192,16 @@ module.exports = function(app, passport) {
                 return
             }
 
+            // 2) Retrieve all the nights that have been created my the user
+            controllers["night"].find({'_id': { $in: result.organisedNights.id}}, function(err, docs){
+                console.log(docs);
+            })
+   
             res.json({
                 data: results
             })
         })
-    });
+    });*/
 
      // POST to change nights status
     app.post('/nights/:id', function(req, res) {

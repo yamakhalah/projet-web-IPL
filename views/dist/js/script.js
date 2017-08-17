@@ -156,8 +156,7 @@ var gameNightHandler = function() {
     // Create night 
     $("#sendInvitesButton").on('click', function() {
         var night = formToJson('formCreation');
-        var date = moment(night['date'], 'DD/MM/YYYY');
-
+        var date = moment(night['date'], 'YYYY/MM/DD'); // J'ai (Gabriel) inversé le format car il posait problème chez moi
         night['date'] = new Date(date.valueOf());
         night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
         night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0000 2017");

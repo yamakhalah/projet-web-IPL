@@ -39,14 +39,6 @@ $(document).ready(function() {
             '</div>')
     })
 
-    $('#addNightGameButton').click(function () {
-        $('#addNightGameButton').before('<div class="input-group" style="margin-bottom: 20px">' +
-            '<select id="jsGameX" class="form-control">\n' +
-            '<option>A IMPLEMENTER EN JS</option>\n' +
-            '</select>' +
-            '</div>')
-    })
-
 
 
     $('#navJeux').click(function() {
@@ -287,6 +279,26 @@ var gamesHandler = function() {
 	            }
         	})
         }
+    });
+
+    $("#buttonModalAddGame").on('click', function(e) {
+        e.preventDefault();
+        if (! $('#modalFormAddGame').valid()) {
+        	return;
+        } else {
+			$.ajax({
+	            url: "/game",
+	            type: "post",
+	            data: formToJson("modalFormAddGame"),
+	            success: function(data, status, jqXHR) {
+	            	$(".modal.in").modal("hide");
+	                Utils.notifySucces("Jeu ajouté avec succès");
+	                gamesTable.ajax.url("/games").load();
+	            }, error: function(jqXHR, status, err) {
+	                Utils.notifyError(status);
+	            }
+        	})
+        }
     })
 
     // List all games
@@ -350,6 +362,7 @@ var CheckInputForm = (function() {
 	var validatorFormLogin;
 	var validatorFormCreation;
 	var validatorAddGameForm;
+	var validatorModalFormAddGame;
 	// Form validation
 	var validationFormLogin = {
 		rules: {
@@ -499,6 +512,7 @@ var CheckInputForm = (function() {
 		validatorFormInscription = $('#formInscription').validate(validationFormInscription);
 		validatorFormCreation = $('#formCreation').validate(validationFormCreation);
 		validatorAddGameForm = $('#addGameForm').validate(validationAddGameForm);
+		validatorModalFormAddGame = $('#modalFormAddGame').validate(validationAddGameForm);
 	}
 
 	// Clear Form
@@ -522,6 +536,11 @@ var CheckInputForm = (function() {
 		validatorAddGameForm.resetForm();
 	}
 
+	function clearModalFormAddGame() {
+		$('#modalFormAddGame').find(':input').val('');
+		validatorModalFormAddGame.resetForm();
+	}
+
 
 	return {
 		initValidatorPlugin: initValidatorPlugin,
@@ -529,7 +548,8 @@ var CheckInputForm = (function() {
 		clearFormLogin: clearFormLogin,
 		clearFormInscription: clearFormInscription,
 		clearFormCreation: clearFormCreation,
-		clearAddGameForm: clearAddGameForm
+		clearAddGameForm: clearAddGameForm,
+		clearModalFormAddGame: clearModalFormAddGame
 	}
 })();
 
@@ -554,6 +574,16 @@ var Init = (function() {
         $("#disconnection").click(function() {
             User.logOut();
         });
+
+
+        $('#buttonModalReturn').click(function() {
+        	CheckInputForm.clearModalFormAddGame();
+        });
+
+        $('.modal').on('hidden.bs.modal', function(){
+        	$("#modalFormAddGame").find('.has-error').removeClass("has-error");
+        	CheckInputForm.clearModalFormAddGame();
+    	});
 
         CheckInputForm.initValidatorPlugin();
         CheckInputForm.initAllValidatorForm();

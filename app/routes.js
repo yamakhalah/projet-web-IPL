@@ -237,8 +237,31 @@ module.exports = function(app, passport) {
                 return
             }
 
-            res.json({
-                data: result
+            var nightId = {
+                'id': result._id,
+                'isValidated': false
+            }
+            if (req.user.organisedNights) {
+                req.user.organisedNights.push(nightId)
+            } else {
+                req.user['organisedNights'] = [nightId]
+            }
+
+            var controller = controllers["user"]
+
+            controller.update(req.user._id, req.user, function(err, user) {
+                if (err) {
+                    res.json({
+                        confirmation: 'fail',
+                        message: "Couldn't update this night : " + id
+                    })
+                    logger.info(err)
+                    return
+                }
+
+                res.json({
+                    data: result
+                })
             })
         })
     })
@@ -251,7 +274,7 @@ module.exports = function(app, passport) {
             if (err) {
                 res.json({
                     confirmation: 'fail',
-                    message: "Couldn't find any users with the id : " + req.user._id
+                    message: "Couldn't find any users with the id : " + req.user._id.toString()
                 })
                 logger.info(err)
                 return

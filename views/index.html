@@ -38,12 +38,22 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li id="invite" class="active"><a id="displayInvitations" style="cursor: pointer; color: black;">Invitations</a></li>
-                    <li id="management" ><a id="displayManagement" style="cursor: pointer; color: black;">Gestion de soirées</a></li>
+                    
+                    <li id="management" class="dropdown" >
+                        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="cursor: pointer; color: black;">Gestion de soirées
+                        <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a id="displayManagementCreate" style="cursor: pointer; color: black;">Créer une soirée</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a id="displayManagementManage" style="cursor: pointer; color: black;">Gérer mes soirées</a></li>
+                        </ul>
+
                     <li id="night"><a id="displayNights" style="cursor: pointer; color: black;">Soirées à venir</a></li>
                     <li id="game"><a id="displayGames" style="cursor: pointer; color: black;">Jeux</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a id="disconnection" style="cursor: pointer; color: black;">Déconnexion</a></li>
+                    <li><a id="disconnection" style="cursor: pointer; color: black;"><i class="fa fa-sign-out"></i> Déconnexion</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
@@ -65,15 +75,19 @@
                     
                     <div class="panel-body">
                         <form id="formLogin" role="form">
-                            <div class="form-group input-group">
-                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                <input id="login" class="form-control" placeholder="Email"
-                                    name="email" type="text" autofocus>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                    <input id="login" class="form-control" placeholder="Email"
+                                        name="email" type="text" autofocus>
+                                </div>
                             </div>
-                            <div class="form-group input-group">
-                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                <input id="mdp" class="form-control" placeholder="Mot de passe"
-                                    name="password" type="password">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                    <input id="mdp" class="form-control" placeholder="Mot de passe"
+                                        name="password" type="password">
+                                </div>
                             </div>
                             <!--GESTION EREURS <div class="errorMessages"></div> -->
                             <div
@@ -109,17 +123,21 @@
                             <label>Utilisateur</label>
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <div class="form-group input-group">
-                                        <span class="input-group-addon"><i class="fa fa-user"></i></span><input
-                                            class="form-control" placeholder="Nom" name="lastname" type="text"
-                                            autofocus>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-user"></i></span><input
+                                                class="form-control" placeholder="Nom" name="lastname" type="text"
+                                                autofocus>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="form-group input-group">
-                                        <span class="input-group-addon"><i class="fa fa-user"></i></span><input
-                                            class="form-control" placeholder="Prénom" name="firstname"
-                                            type="text">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-user"></i></span><input
+                                                class="form-control" placeholder="Prénom" name="firstname"
+                                                type="text">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -128,29 +146,35 @@
                             <label>Compte</label>
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <div class="form-group input-group">
-                                        <span class="input-group-addon"><i
-                                            class="fa fa-envelope"></i></span><input class="form-control"
-                                            placeholder="Email" name="email" type="text">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i
+                                                class="fa fa-envelope"></i></span><input class="form-control"
+                                                placeholder="Email" name="email" type="text">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <div class="form-group input-group">
-                                        <span class="input-group-addon"><i class="fa fa-lock"></i></span><input
-                                            id ="insc-password"
-                                            class="form-control" placeholder="Mot de passe"
-                                            name="password" type="password">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-lock"></i></span><input
+                                                id ="insc-password"
+                                                class="form-control" placeholder="Mot de passe"
+                                                name="password" type="password">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="form-group input-group">
-                                        <span class="input-group-addon"><i class="fa fa-lock"></i></span><input
-                                            class="form-control"
-                                            placeholder="Mot de passe (confirmation)"
-                                            name="passwordConfirmation" type="password">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-lock"></i></span><input
+                                                class="form-control"
+                                                placeholder="Mot de passe (confirmation)"
+                                                name="passwordConfirmation" type="password">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -203,160 +227,191 @@
         </div>
     </div>
 
-    <div id="divManagement" class="container" style="display: none;z-index: 100; margin-top: 150px;">
+    <div id="divManagementCreate" class="container" style="display: none;z-index: 100;">
         <div class="row">
-            <div class="col-md-offset-3 col-md-5 text-center">
-                <div class="panel panel-red" style="margin-top: 100px">
-                    <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
-                        <h3 class="panel-title"><b>Gestion de soirée</b></h3>
-                    </div>
-                    <div class="panel-body">
-                        <button id="createButton" type="button" class="btn btn-primary" style="width: 150px">Créer</button>
-                        <button id="manageButton" type="button" class="btn btn-primary" style="width: 150px">Gérer</button>
-                    </div>
+            <div class="panel panel-primary" style="margin-top: 100px">
+                <div class="panel-heading text-center">
+                    <h3 class="panel-title">Création d'une soirée</h3>
                 </div>
-            </div>
-        </div>
-        <div class="row">
-            <div id="sectionCreateJeux" class="col-md-6 text-center" style="display: block">
-                <div class="panel panel-primary">
-                    <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
-                        <h3 class="panel-title"><b>Jeux</b></h3>
-                    </div>
-                    <div class="panel-body">
-                        <form id="formJeux" role="form">
-                            <label>Liste des jeux disponibles</label>
-                            <table class="table table-bordered" id="playable-games-table" style="width: 100%; overflow-x: scroll;">
-                                <thead>
-                                    <tr>
-                                        <th style="text-align: center;"><input type="checkbox" name="selectAll" id="selectAll"></th>
-                                        <th style="text-align: center;">Nom</th>
-                                        <th style="text-align: center;">Min/Max</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                            <label><button id="addNightGameButton" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalAddGame" 
-                                        style="width: 150px">Ajouter un jeu</button></label>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div id="sectionCreate1" class="col-md-5" style="display: block">
-                <div class="panel panel-primary">
-                    <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
-                        <h3 class="panel-title"><b>Création</b></h3>
-                    </div>
-                    <div class="panel-body">
-                        <form id="formCreation" role="form">
-                            <div class="form-group">
-                                <label>Nom de la soirée</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-comment"></i></span>
-                                    <input id="name" class="form-control" placeholder="Nom"
-                                           name="name" type="text" autofocus>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Date de la soirée</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                    <input id="date" class="form-control" placeholder="06/07/1993"
-                                           name="date" type="date">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Description</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-file-text"></i></span>
-                                    <textarea id="description" class="form-control" placeholder="Décrivez votre soirée ici."
-                                              name="description" type="text" rows=8 style="height: 100px"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Début</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-hourglass"></i></span>
-                                    <input type="text" name="startTime" id="startTime" class="form-control clockpicker">
-                                </div>
-                                <label>Fin</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-hourglass"></i></span>
-                                    <input type="text" name="endTime" id="endTime" class="form-control clockpicker">
-                                </div>
-                                <button id="validateNightButton" type="button" class="btn btn-success btn-block" style=" margin-top: 20px">Valider et inviter</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div id="sectionCreate2" class="col-md-offset-1 col-md-10" style="display: none">
-                <div class="panel panel-primary">
-                    <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
-                        <h3 class="panel-title"><b>Création</b></h3>
-                    </div>
-                    <div class="panel-body">
-                        <form id="exemple2" role="form">
-                            <div id="sectionCreate2Form" class="form-group">
-                                <label>Liste d'utilisateurs</label>
-                                <table class="table table-bordered" id="invite-guests-table" style="width: 100%;">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Nom</th>
-                                            <th>Prénom</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                            <label>Inviter par email</label>
-                            <div class="form-group">
-                                <input id="section2emailInput"  placeholder="uneAdresse@unFournisseur.com"
-                                       name="name" type="text" style="width: 200px">
-                                <button id="addUserEmailButton" class="btn btn-primary" type="button" style="margin-left: 40px">Ajouter</button>
-                            </div>
-                            <button id="sendInvitesButton" class="btn btn-success btn-block" type="button" style=" margin-top: 35px">Envoyer les invitations</button>
-                        </form>
+                <div class="panel-body">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#night1" data-toggle="tab" aria-expended="true" >Etape 1 - Soirée</a>
+                        </li>
+                        <li class="">
+                            <a href="#night2" data-toggle="tab" aria-expanded="false">Etape 2 - Jeux</a>
+                        </li>
+                        <li class="">
+                            <a href="#night3" data-toggle="tab" aria-expanded="false">Etape 3 - Invitations</a>
+                        </li>
+                    </ul>
 
-                    </div>
-                </div>
-            </div>
-            <div id="sectionManage" class="col-md-10 col-md-offset-1" style="display: none">
-                <div class="panel panel-primary">
-                    <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
-                        <h3 class="panel-title"><b>Gérer</b></h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="form-group">
-                            <label class="control-label">1) 16/09/2017 - Lan War Legend - 18H-00H</label>
-                            <div >
-                            <table id="managementTable" class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Jeu</th>
-                                        <th>Participants</th>
-                                        <th ></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Test</td>
-                                        <td>Test</td>
-                                        <td>button</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="tab-content">
+                        <div class="tab-pane fade active in" id="night1">
+                            <h4 style="font-style: italic; text-decoration: underline">Etape 1 - Création de la soirée</h4>
+                            <p style="margin-top: 20px">
+                                <form id="formCreation" role="form">
+                                    <div class="form-group">
+                                        <label>Nom de la soirée</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-comment"></i></span>
+                                            <input id="name" class="form-control" placeholder="Nom"
+                                                   name="name" type="text" autofocus>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Date de la soirée</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            <input id="date" class="form-control" placeholder="06/07/1993"
+                                                   name="date" type="date">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-file-text"></i></span>
+                                            <textarea id="description" class="form-control" placeholder="Décrivez votre soirée ici."
+                                                      name="description" type="text" rows=8 style="height: 100px"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <label>Heure du début</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-hourglass"></i></span>
+                                                    <input type="text" name="startTime" id="startTime" class="form-control clockpicker">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <label>Heure de fin</label> 
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-hourglass"></i></span>
+                                                    <input type="text" name="endTime" id="endTime" class="form-control clockpicker">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </p>
+                        </div>
+
+                        <div class="tab-pane fade" id="night2">
+                            <h4 style="font-style: italic; text-decoration: underline">
+                                Etape 2 - Sélectionner le(s) jeu(x) de votre soirée
+                                <button id="addNightGameButton" class="btn btn-primary btn-sm pull-right" 
+                                    data-toggle="modal" data-target="#modalAddGame" style="font-style: normal;">
+                                    <i class="fa fa-plus-square fa-fw"></i> Ajouter un jeu
+                                </button>
+                            </h4>
+                            
+                            <p style="margin-top: 20px">
+                                <form id="formJeux" role="form">
+                                    <table class="table table-bordered" id="playable-games-table" style="width: 100%; overflow-x: scroll;">
+                                        <thead>
+                                            <tr>
+                                                <th style="text-align: center;"><input type="checkbox" name="selectAll" id="selectAll"></th>
+                                                <th style="text-align: center;">Nom</th>
+                                                <th style="text-align: center;">Min/Max</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </p>
+                        </div>
+
+                        <div class="tab-pane fade" id="night3">
+                            <h4 style="font-style: italic; text-decoration: underline">Etape 3 - Sélectionner les personnes à inviter</h4>
+                            <div class="row" style="margin-top: 20px">
+                                <div class="col-md-8" style="padding-right:20px; border-right: 1px solid #ccc;">
+                                    <form id="exemple2" role="form">
+                                        <div id="sectionCreate2Form" class="form-group">
+                                            <label>Liste d'utilisateurs</label>
+                                            <table class="table table-bordered" id="invite-guests-table" style="width: 100%;">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>Nom</th>
+                                                        <th>Prénom</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <button id="addUserEmailButton" class="btn btn-primary btn-block" type="button">
+                                        <i class="fa fa-plus-square fa-fw"></i> Invitation via Email
+                                    </button>
+                                    <!--
+                                    <div class="row pInvitationEmail" style="margin-top: 13px">
+                                        <div class='col-lg-10'>
+                                            <div class='input-group'>
+                                                <span class='input-group-addon'><i class='fa fa-envelope'></i></span>
+                                                <input class='form-control inputInvitationEmail' placeholder='example@gmail.com' name='email' type='text' />
+                                            </div>  
+                                        </div>
+                                        <div class='col-lg-2'>
+                                            <button class='btn btn-danger btn-sm pull-right butDeleteRowEmail' /><i class='fa fa-times-circle-o'></i>
+                                        </div>
+                                    </div>
+                                    -->                         
+                                </div>
                             </div>
-                            <button id="cancelNightButton" class="btn btn-danger btn-block" type="button" style=" margin-top: 35px">Annuler la soirée</button>
                         </div>
                     </div>
+                </div>
+                <!-- /. End panel body-->
+                <div class="panel-footer clearfix">
+                    <div class="pull-right">
+                        <button id="validateNightButton" type="button" class="btn btn-primary">
+                        <i class="fa fa-arrow-circle-right"></i> Valider
+                        </button>
+                    </div>
+                </div>      
+            </div>
+            <!-- /. End panel-->
+        </div>
+    </div>
+            
+    <div id="divManagementManage" class="container" style="display: none;z-index: 100; margin-top: 150px;">
+        <div class="panel panel-primary" style="margin-top: 100px">
+            <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
+                <h3 class="panel-title"><b>Gérer</b></h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label">1) 16/09/2017 - Lan War Legend - 18H-00H</label>
+                    <div >
+                    <table id="managementTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Jeu</th>
+                                <th>Participants</th>
+                                <th ></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Test</td>
+                                <td>Test</td>
+                                <td>button</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                    <button id="cancelNightButton" class="btn btn-danger btn-block" type="button" style=" margin-top: 35px">Annuler la soirée</button>
                 </div>
             </div>
         </div>
     </div>
+
     <div id="divNights" class="container" style="display: none;z-index: 100;">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">

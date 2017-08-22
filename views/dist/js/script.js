@@ -26,17 +26,43 @@ $(document).ready(function() {
     })
 
     $('#validateNightButton').click(function () {
-    	if ($('#formCreation').valid()) {
-        	toggleSectionManagement(2);
-    	}
+    	var idPanel = $('div[class="tab-pane fade active in"]').attr('id');
+        var newPanel = 0;
+        console.log("IdPanel -> " + idPanel);
+        switch(idPanel) {
+            case "night1":
+                if ($('#formCreation').valid()) {
+                    newPanel = 2;
+                }
+                break;
+            case "night2":
+                newPanel = 3;
+                break;
+            case "night3":
+                // On reteste tous les formulaires avant, verifier qu'il n'y a pas eu de mofis
+                break;
+        }
+
+    	if (newPanel !== 0) {
+            $('div[class="tab-pane fade active in"]').removeClass("active in");
+            $('a[href="#' + idPanel +'"]').parent().removeClass("active");
+            $('#night' + newPanel).addClass("active in");
+            $('a[href="#night' + newPanel + '"]').parent().addClass("active");
+
+        }
     });
 
 
-    $('#addUserEmailButton').click(function () {
-        var email = $('#section2emailInput').val()
-        $('#sectionCreate2Form').append('<div id="exempleCheckboxX" class="checkbox">\n' +
-            '<label><input type="checkbox" value="idInDBX" checked>'+email+'</label>\n' +
-            '</div>')
+    $('#addUserEmailButton').click(function() {
+        $('#addUserEmailButton').after("<div class='row pInvitationEmail' style='margin-top: 13px'><div class='col-lg-10'><div class='input-group'><span class='input-group-addon'><i class='fa fa-envelope'></i></span><input class='form-control inputInvitationEmail' placeholder='example@gmail.com' name='email' type='text' /></div></div><div class='col-lg-2'><button class='btn btn-danger btn-sm pull-right butDeleteRowEmail'><i class='fa fa-times-circle-o'></i></button></div></div>");
+        
+    });
+
+    $(document).on('click', '.butDeleteRowEmail', function() {
+        alert("oui");
+        console.log(this);
+        console.log($(this).closest('.pInvitationEmail'));
+        $(this).closest('.pInvitationEmail').remove();
     })
 
 
@@ -373,15 +399,19 @@ var CheckInputForm = (function() {
 			},
 			password: {
 				required: true,
+                minlength: 4,
 				maxlength: 35
 			}
 		},
 		messages: {
 			email: {
 				required: "Veuillez indiquer votre email",
-				email: "Email incorrect"
+				email: "Format email incorrect [exemple@gmail.com]"
 			},
-			password: "Veuillez indiquer votre mot de passe"
+			password:  {
+                required: "Veuillez indiquer votre mot de passe",
+                minlength: "Mot de passe de minimum 4 caractères"
+            }
 		}
 	};
 
@@ -401,10 +431,12 @@ var CheckInputForm = (function() {
                     maxlength: 255
                 },
                 password: {
-                    required: true
+                    required: true,
+                    minlength: 4
                 },
                 passwordConfirmation: {
                     required: true,
+                    minlength: 4,
                     equalTo: "#insc-password"
                 }
         },
@@ -412,9 +444,13 @@ var CheckInputForm = (function() {
                 lastname: "Veuillez indiquer votre nom",
                 firstname: "Veuillez indiquer votre prénom",
                 email: "L'email est invalide",
-                password: "Veuillez indiquer votre mot de passe",
+                password: {
+                    required: "Veuillez indiquer votre mot de passe",
+                    minlength: "Minimum 4 caractères"
+                },
                 passwordConfirmation: {
                 	required: "",
+                    minlength: "Minimum 4 caractères",
                 	equalTo: "Les deux mots de passes ne correspondent pas"
                 }
         }
@@ -470,7 +506,7 @@ var CheckInputForm = (function() {
                 }
         },
         messages: {
-                name: "Veuillez indiquer le nom de la soirée",
+                name: "Veuillez indiquer le nom du jeu",
                 description: {
                 	required: "Veuillez indiquer une description",
                 	maxlength: "La description ne peut dépasser 1000 caractères"

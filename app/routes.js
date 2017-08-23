@@ -1,7 +1,9 @@
 var fs = require('fs');
 var logger = require('../config/logger');
-var controllers = require('./controllers') // no need to put /index.js because it is the default file
+var controllers = require('./controllers'); // no need to put /index.js because it is the default file
 var mongoose = require('mongoose');
+var nodemailer = require('nodemailer');
+var constants = require('../config/constants');
 'use strict';
 
 // To check if a user is authenticated use
@@ -144,6 +146,8 @@ module.exports = function(app, passport) {
         })
     })
 
+    // GET all games by night where user are registered
+
     /***************************************************
      * All the routes linked to the Login and signup ***
      **************************************************/
@@ -174,6 +178,46 @@ module.exports = function(app, passport) {
     }));
 
     /****************************************
+     * All the routes linked to the Emails **
+     ***************************************/
+    // POST send all the emails of unregistered users
+    app.post('/emails/sendEmails', function(req, res) {
+        req.body.users.forEach(function(user, index) {
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'night.game.ipl@gmail.com',
+                    pass: 'n1ght.g4m3_1PL'
+                }
+            });
+    
+            var mailOptions = {
+                from: 'night.game.ipl@gmail.com',
+                to: user.email,
+                subject: 'Invitation à une soirée jeux via night-game',
+                text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous inscrire via ce lien: '
+                    + constants.SERVER_ADDRESS + '/registration/' + user.id + ' \n\nA bientôt sur night-game.' 
+            };
+            
+            transporter.sendMail(mailOptions, function(err, info){
+                if (err) {
+                    res.json({
+                        confirmation: 'fail',
+                        message: "Couldn't send email to " + user.email
+                    })
+                    logger.info(err)
+                    return
+                } else {
+                  res.json({
+                      confirmation: 'success'
+                  })
+                }
+              }); 
+        });
+        
+    });
+
+    /****************************************
      * All the routes linked to the Nights **
      ***************************************/
     // GET all nights of a host (TO CONTINUE (Gaby))
@@ -202,6 +246,27 @@ module.exports = function(app, passport) {
             })
         })
     });*/
+
+
+    // GET all games of a night
+    app.get('/nights/games/:id/', function(req, res) {
+        var controller = controllers["night"]
+
+        controller.findById(id, function(err, results) {
+            if (err) {
+                res.json({
+                    confirmation: 'fail',
+                    message: "Couldn't find the games of this night : " + id
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                data: results.games
+            })
+        });
+    });
 
      // POST to change nights status
     app.post('/nights/:id', function(req, res) {

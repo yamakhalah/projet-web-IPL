@@ -130,6 +130,17 @@ module.exports = function(app, passport) {
 
     // POST a game
     app.post('/game', function(req, res, next) {
+        var data = Array();
+        data.push({ value : req.body.name, title : 'le nom' });
+        data.push({ value : req.body.description, title : 'la description' });
+        data.push({ value : req.body.minPlayers, title : 'le nombre de joueurs minimum' });
+        data.push({ value : req.body.maxPlayers, title : 'le nombre de joueurs maximum' });
+        var check = checkData(data);
+        if (! check.success) {
+            res.json(check);
+            return;
+        }
+
         var controller = controllers["game"]
 
         controller.create(req.body, function(err, result) {
@@ -176,11 +187,24 @@ module.exports = function(app, passport) {
     });
 
     // process the signup form
-    // Since this is a Single page app, the redirection will be to index.html, but a check is needed to know what to show.
     app.post('/signup', function(req, res, next) {
+        var data = Array();
+        data.push({ value : req.body.firstname, title : 'votre prénom' });
+        data.push({ value : req.body.lastname, title : 'votre nom' });
+        data.push({ value : req.body.email, title : 'votre adresse mail' });
+        data.push({ value : req.body.password, title : 'votre mot de passe' });
+        var check = checkData(data);
+        if (! check.success) {
+            return res.send(check);
+        }
+
+        if (req.body.password != req.body.passwordConfirmation) {
+            return res.send({ success : false, message : "Les deux mots de passes ne sont pas identiques" });
+        }
+
         passport.authenticate('local-signup', function(err, user, info) {
             if (err) {
-                return next(err); // will generate a 500 error
+                return next(err);
             }
             
             if (! user) {
@@ -307,7 +331,19 @@ module.exports = function(app, passport) {
 
     // POST a night
     app.post('/night', function(req, res, next) {
-        var controller = controllers["night"]
+        // Check if the data is fully filled
+        var data = Array();
+        data.push({ value : req.body.date, title : 'la date' });
+        data.push({ value : req.body.startTime, title : 'l\'heure de début' });
+        data.push({ value : req.body.endTime, title : 'l\'heure de fin' });
+        data.push({ value : req.body.description, title : 'la description' });
+        var check = checkData(data);
+        if (! check.success) {
+            res.json(check);
+            return;
+        }
+
+        var controller = controllers["night"];
 
         controller.create(req.body, function(err, result) {
             if (err) {
@@ -335,7 +371,7 @@ module.exports = function(app, passport) {
                 if (err) {
                     res.json({
                         success: false,
-                        message: "Couldn't update this night : " + id
+                        message: "Couldn't update the user organising the night : " + id
                     })
                     logger.info(err)
                     return
@@ -400,4 +436,11 @@ module.exports = function(app, passport) {
     });
 };
 
-    
+var checkData = function (data) {
+    for (var element of data) {
+        if (element.value == "" || element.value == null) {
+            return {success: false, message: "Veuillez remplir " + element.title}
+        }
+    }
+    return { success: true }
+}

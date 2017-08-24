@@ -6,6 +6,7 @@ $(document).ready(function() {
     Init.all();
     Init.navUser();
 
+    // Check if the use is authenticated
     $.ajax({
         url: "/isAuthenicated",
         type: "get",

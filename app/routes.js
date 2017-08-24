@@ -45,7 +45,7 @@ module.exports = function(app, passport) {
         controller.find(null, function(err, results) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: err
                 })
                 logger.info(err)
@@ -54,7 +54,7 @@ module.exports = function(app, passport) {
 
             logger.info("GET Users : OK");
             res.json({
-                confirmation: 'success',
+                success: true,
                 data: results
             })
         })
@@ -68,7 +68,7 @@ module.exports = function(app, passport) {
         controller.findById(id, function(err, result) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: 'Couldn\'t find the user'
                 })
                 logger.info(err)
@@ -76,7 +76,7 @@ module.exports = function(app, passport) {
             }
 
             res.json({
-                confirmation: 'success',
+                success: true,
                 result: result
             })
         })
@@ -92,16 +92,17 @@ module.exports = function(app, passport) {
         controller.find(null, function(err, results) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: err
                 })
                 logger.info(err)
                 return
             }
 
-            res.json(
-                {data: results}
-            )
+            res.json({
+                data: results,
+                success: true
+            })
         })
     });
 
@@ -113,7 +114,7 @@ module.exports = function(app, passport) {
         controller.findById(id, function(err, result) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: 'Couldn\'t find the game'
                 })
                 logger.info(err)
@@ -121,7 +122,8 @@ module.exports = function(app, passport) {
             }
 
             res.json({
-                data: result
+                data: result,
+                success: true
             })
         })
     });
@@ -133,7 +135,7 @@ module.exports = function(app, passport) {
         controller.create(req.body, function(err, result) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: err
                 })
                 logger.info(err)
@@ -141,7 +143,9 @@ module.exports = function(app, passport) {
             }
 
             res.json({
-                data: result
+                data: result,
+                success: true,
+                message: "Le jeu a bien été ajouté."
             })
         })
     })
@@ -212,14 +216,15 @@ module.exports = function(app, passport) {
             transporter.sendMail(mailOptions, function(err, info){
                 if (err) {
                     res.json({
-                        confirmation: 'fail',
+                        success: false,
                         message: "Couldn't send email to " + user.email
                     })
                     logger.info(err)
                     return
                 } else {
                   res.json({
-                      confirmation: 'success'
+                      success: true,
+                      message: "Le mail à bien été envoyé"
                   })
                 }
               }); 
@@ -265,7 +270,7 @@ module.exports = function(app, passport) {
         controller.findById(id, function(err, results) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: "Couldn't find the games of this night : " + id
                 })
                 logger.info(err)
@@ -273,7 +278,8 @@ module.exports = function(app, passport) {
             }
 
             res.json({
-                data: results.games
+                data: results.games,
+                success: true
             })
         });
     });
@@ -285,7 +291,7 @@ module.exports = function(app, passport) {
         controller.update(id, req.body, function(err, results) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: "Couldn't update this night : " + id
                 })
                 logger.info(err)
@@ -293,7 +299,8 @@ module.exports = function(app, passport) {
             }
 
             res.json({
-                data: results
+                data: results,
+                success: true
             })
         })
     });
@@ -305,7 +312,7 @@ module.exports = function(app, passport) {
         controller.create(req.body, function(err, result) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: err
                 })
                 logger.info(err)
@@ -327,7 +334,7 @@ module.exports = function(app, passport) {
             controller.update(req.user._id, req.user, function(err, user) {
                 if (err) {
                     res.json({
-                        confirmation: 'fail',
+                        success: false,
                         message: "Couldn't update this night : " + id
                     })
                     logger.info(err)
@@ -335,7 +342,8 @@ module.exports = function(app, passport) {
                 }
 
                 res.json({
-                    data: result
+                    data: result,
+                    success: true
                 })
             })
         })
@@ -348,7 +356,7 @@ module.exports = function(app, passport) {
         controller.find(req.user._id.toString(), function(err, nights) {
             if (err) {
                 res.json({
-                    confirmation: 'fail',
+                    success: false,
                     message: "Couldn't find any users with the id : " + req.user._id.toString()
                 })
                 logger.info(err)
@@ -382,7 +390,8 @@ module.exports = function(app, passport) {
                     i++;
                     if (i == nights.length-1) {
                         res.json({
-                            data: toReturn
+                            data: toReturn,
+                            success: true
                         })
                     }
                 })

@@ -1,5 +1,6 @@
 var connected = false;
 var gamesTable;
+var playableGamesTable;
 
 $(document).ready(function() {
     Init.all();
@@ -43,6 +44,60 @@ $(document).ready(function() {
                 newPanel = 3;
                 break;
             case "night3":
+                var night = formToJson('formCreation');
+                var date = moment(night['date'], 'DD/MM/YYYY');
+                night['date'] = new Date(date.valueOf());
+                night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
+                night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0000 2017");
+
+                // Fetch the games chosen for the night
+                var games = new Array();
+                var i = 0;
+                $("#playable-games-table").find("input:checked").each(function() {
+                    var tr = $(this).closest('tr');
+                    games[i] = {
+                        id : tr.attr('id'),
+                        nbParticipants : 0
+                    }
+                    i++;
+                });
+                if (i == 0) {
+                    Utils.notifyError('Veuillez sélectionner au moins un jeu');
+                } else {
+                    // Fetch the guests to invite
+                    var guests = new Array();
+                    i = 0;
+                    $("#invite-guests-table").find("input:checked").each(function() {
+                        var tr = $(this).closest('tr');
+                        guests[i] = {
+                            id : tr.attr('id'),
+                            isValidated : false
+                        }
+                        i++;
+                    });
+
+                    if (i == 0) {
+                        Utils.notifyError('Veuillez sélectionner au moins un invité');
+                    } else {
+                        night['games'] = games;
+                        night['guests'] = guests;
+                        
+                        $.ajax({
+                            url: "/night",
+                            type: "post",
+                            data: night,
+                            success: function(data, status, jqXHR) {
+                                if (! data.success) {
+                                    Utils.notifyError(data.message);
+                                } else {
+                                    Utils.notifySucces("La soirée a bien été créée");
+                                }
+                            }, error: function(jqXHR, status, err) {
+                                Utils.notifyError(status);
+                            }
+                        });
+                    }
+                }
                 // On reteste tous les formulaires avant, verifier qu'il n'y a pas eu de mofis
                 break;
         }
@@ -160,7 +215,7 @@ var gameNightHandler = function() {
                 "targets": 2
             }
         ]
-    initDatatable("playable-games-table", "/games", playableGamesColumns, playableGamesColumnDefs);
+    playableGamesTable = initDatatable("playable-games-table", "/games", playableGamesColumns, playableGamesColumnDefs);
 
     // List of possible guests
     var guestTableColumns = [
@@ -180,49 +235,7 @@ var gameNightHandler = function() {
 
     // Create night 
     $("#sendInvitesButton").on('click', function() {
-        var night = formToJson('formCreation');
-        var date = moment(night['date'], 'YYYY/MM/DD'); // J'ai (Gabriel) inversé le format car il posait problème chez moi
-        night['date'] = new Date(date.valueOf());
-        night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
-        night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0000 2017");
-
-        // Fetch the games chosen for the night
-        var games = new Array();
-        var i = 0;
-        $("#playable-games-table").find("input:checked").each(function() {
-            var tr = $(this).closest('tr');
-            games[i] = {
-                id : tr.attr('id'),
-                nbParticipants : 0
-            }
-            i++;
-        });
-
-        // Fetch the guests to invite
-        var guests = new Array();
-        i = 0;
-        $("#invite-guests-table").find("input:checked").each(function() {
-            var tr = $(this).closest('tr');
-            guests[i] = {
-                id : tr.attr('id'),
-                isValidated : false
-            }
-            i++;
-        });
-
-        night['games'] = games;
-        night['guests'] = guests;
         
-        $.ajax({
-            url: "/night",
-            type: "post",
-            data: night,
-            success: function(data, status, jqXHR) {
-                Utils.notifySucces("La soirée a bien été créée");
-            }, error: function(jqXHR, status, err) {
-                Utils.notifyError(status);
-            }
-        });
     })
 }
 
@@ -312,8 +325,13 @@ var gamesHandler = function() {
 	            type: "post",
 	            data: formToJson("addGameForm"),
 	            success: function(data, status, jqXHR) {
-	                Utils.notifySucces("Jeu ajouté avec succès");
-	                gamesTable.ajax.url("/games").load();
+                    if (! data.success) {
+                        Utils.notifyError(data.message);
+                    } else {
+    	                Utils.notifySucces("Jeu ajouté avec succès");
+                        gamesTable.ajax.url("/games").load();
+    	                playableGamesTable.ajax.url("/games").load();
+                    }
 	            }, error: function(jqXHR, status, err) {
 	                Utils.notifyError(status);
 	            }
@@ -331,9 +349,14 @@ var gamesHandler = function() {
 	            type: "post",
 	            data: formToJson("modalFormAddGame"),
 	            success: function(data, status, jqXHR) {
-	            	$(".modal.in").modal("hide");
-	                Utils.notifySucces("Jeu ajouté avec succès");
-	                gamesTable.ajax.url("/games").load();
+                    if (! data.success) {
+                        Utils.notifyError(data.message);
+                    } else {
+    	            	$(".modal.in").modal("hide");
+    	                Utils.notifySucces(data.message);
+                        gamesTable.ajax.url("/games").load();
+    	                playableGamesTable.ajax.url("/games").load();
+                    }
 	            }, error: function(jqXHR, status, err) {
 	                Utils.notifyError(status);
 	            }

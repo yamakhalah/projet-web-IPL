@@ -14,6 +14,10 @@ $(document).ready(function() {
         }, error: function(jqXHR, status, err) {
             $("#divConnexion").show();
         }
+    }).done(function (){
+        if (connected) {
+            functionsAfterConnection();
+        }
     });
 
     $('#createButton').click(function () {
@@ -232,14 +236,20 @@ var User = (function() {
 	            type: "post",
 	            data: formToJson("formLogin"),
 	            success: function(data, status, jqXHR) {
-	                Utils.notifySucces("Connexion réussie");
-	                connected = true;
-	                Init.navUser();
+                    if (! data.success) {
+                        Utils.notifyError(data.message);
+                    } else {
+    	                Utils.notifySucces(data.message);
+    	                connected = true;
+    	                Init.navUser();
+                    }
 	            }, error: function(jqXHR, status, err) {
-	                Utils.notifyError(status);
+	                Utils.notifyError(err);
 	            }
 	        }).done(function() {
-	            functionsAfterConnection();
+                if (connected) {
+	               functionsAfterConnection();
+                }
 	        })
 	    }
     }
@@ -266,10 +276,14 @@ var User = (function() {
 	            type: "post",
 	            data: formToJson("formInscription"),
 	            success: function(data, status, jqXHR) {
-	                Utils.notifySucces("Vous pouvez dès a présent vous connecter");
-	                setTimeout(function() {
-	                    location.reload();
-	                }, 1000);
+                    if (! data.success) {
+                        Utils.notifyError(data.message);
+                    } else {
+    	                Utils.notifySucces(data.message);
+    	                setTimeout(function() {
+    	                    location.reload();
+    	                }, 1000);
+                    }
 	            }, error: function(jqXHR, status, err) {
 	                Utils.notifyError("Une erreur s'est produite: " + err);
 	            }

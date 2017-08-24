@@ -24,12 +24,12 @@ module.exports = function(passport) {
         User.findOne({ 'email' :  email }, function(err, user) {
             if (err) {
                 logger.info("An error occured when trying to find the user");
-                return done(err);
+                return done(null, false, 'Une erreur est survenue.');
             }
 
             if (user) {
                 logger.info("The user allready exists");
-                return done(null, false, { message: 'The user allready exists' });
+                return done(null, false, 'L\'utilisateur existe déjà' );
             } else {
                 var newUser = new User();
 
@@ -42,10 +42,10 @@ module.exports = function(passport) {
                 newUser.save(function(err) {
                     if (err) {
                         logger.info("An error occured while trying to save the user");
-                        throw err;
+                        return done(null, false, 'Une erreur est survenue.');
                     }
                     logger.info("The user has been added");
-                    return done(null, newUser);
+                    return done(null, newUser, "Vous pouvez dès a présent vous connecter");
                 });
             }
 
@@ -62,20 +62,20 @@ module.exports = function(passport) {
         User.findOne({ 'email': email }, function(err, user) {
             if (err) {
                 logger.info("An error occured when trying to find the user");
-                return done(err);
+                return done(null, false, 'Une erreur est survenue.');
             }
 
             if (!user) {
                 logger.info("User not found");
-                return done(null, false, { message: 'User not found' });
+                return done(null, false, 'Aucun utilisateur n\'a été trouvé avec cet identifiant.');
             }
 
             if (!user.validPassword(password)) {
                 logger.info("Wrong password.");
-                return done(null, false, { message: 'Wrong password.' }); 
+                return done(null, false, 'Oops, mauvais mot de passe.'); 
             }
 
-            return done(null, user);
+            return done(null, user, 'Connexion réussie');
         });
 
     }));

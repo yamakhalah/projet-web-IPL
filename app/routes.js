@@ -151,31 +151,41 @@ module.exports = function(app, passport) {
     /***************************************************
      * All the routes linked to the Login and signup ***
      **************************************************/
-    // Login page
-    app.get('/login', function(req, res) {
-        var file = fs.readFileSync("./views/login.html", "UTF8");
-        res.status(200).send(file);
-    });
 
-    // process the login form
-    // Since this is a Single page app, the redirection will be to index.html, but a check is needed to know what to show.
-    app.post('/login', passport.authenticate('local-login', {
-        successRedirect : '/',
-        failureRedirect : '/',
-        failureFlash : true
-    }));
-
-    app.get('/signup', function(req, res) {
-        res.redirect('/ok');
+    app.post('/login', function(req, res, next) {
+        passport.authenticate('local-login', function(err, user, info) {
+            if (err) {
+                return next(err);
+            }
+            
+            // if user is false, send error
+            if (! user) {
+                return res.send({ success : false, message : info });
+            }
+            req.login(user, loginErr => {
+                if (loginErr) {
+                    return next(loginErr);
+                }
+                return res.send({ success : true, message : info });
+            });      
+        })(req, res, next);
     });
 
     // process the signup form
     // Since this is a Single page app, the redirection will be to index.html, but a check is needed to know what to show.
-    app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect : '/',
-        failureRedirect : '/',
-        failureFlash : true 
-    }));
+    app.post('/signup', function(req, res, next) {
+        passport.authenticate('local-signup', function(err, user, info) {
+            if (err) {
+                return next(err); // will generate a 500 error
+            }
+            
+            if (! user) {
+                return res.send({ success : false, message : info });
+            }
+
+            return res.send({ success : true, message : info });
+        })(req, res, next);
+    });
 
     /****************************************
      * All the routes linked to the Emails **

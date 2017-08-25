@@ -396,31 +396,27 @@ module.exports = function(app, passport) {
      * All the routes linked to the Nights **
      ***************************************/
     // GET all nights of a host (TO CONTINUE (Gaby))
-   /* app.get('/nights/:host_id', function(req, res) {
+    app.get('/nights/:hostId', function(req, res) {
         var controller = controllers["user"]
+        var hostId = req.params.hostId;
 
-        // 1) Retrieve the user
-        controller.findById(host_id, function(err, result) {
+        controller.find({ hostId: hostId }, function(err, results) {
 
             if (err) {
                 res.json({
-                    confirmation: 'fail',
-                    message: "Couldn't find any games with that host_id : " + host_id
+                    success: false,
+                    message: err
                 })
                 logger.info(err)
                 return
             }
-
-            // 2) Retrieve all the nights that have been created my the user
-            controllers["night"].find({'_id': { $in: result.organisedNights.id}}, function(err, docs){
-                console.log(docs);
-            })
    
             res.json({
+                success: true,
                 data: results
             })
         })
-    });*/
+    });
 
     // GET all games of a night
     app.get('/night/:idNight/games/', function(req, res) {
@@ -445,11 +441,12 @@ module.exports = function(app, passport) {
     });
 
     // GET all games by night where user is in
-    app.get('/night/findByAuthenticatedUser/:idNight', function(req, res) {
+    app.get('/night/findGamesByAuthenticatedUser/:idNight', function(req, res) {
         // TODO
         var controllerNight = controllers["night"];
         var controllerGame = controllers["game"];
         var idNight = req.params.idNight;
+        var itemsCount = 0;
 
         controllerNight.findById(idNight, function(err, result) {
             if (err) {
@@ -465,24 +462,40 @@ module.exports = function(app, passport) {
             var games = result.games;
             var gamesToReturn = [];
             games.forEach(function (game, index) {
-                controllerGame.findById(game._id, function(err, result) {
-                    if (err) {
-                        res.json({
-                            success: false,
-                            message: err
-                        })
-                        logger.info(err)
-                        return
-                    }
+                if (game.participants.includes(req.user._id)) {
+                    controllerGame.findById(game._id, function(err, result) {
+                        if (err) {
+                            res.json({
+                                success: false,
+                                message: err
+                            })
+                            logger.info(err)
+                            return
+                        }
+    
+                        gamesToReturn.push(result);
 
-                    gamesToReturn.push(result);
-                });
+                        itemsCount++;
+
+                        if (itemsCount === games.length) {
+                            res.json({
+                                data: gamesToReturn,
+                                success: true
+                            });
+                        }
+                    });
+                } else {
+                    itemsCount++;
+
+                    res.json({
+                        data: gamesToReturn,
+                        success: true
+                    });
+                }
+                
             });
             
-            res.json({
-                data: gamesToReturn,
-                success: true
-            });
+            
             
         })
     });

@@ -13,7 +13,8 @@ var nightSchema = mongoose.Schema({
     }],
     games : [{
         id : String,
-        nbParticipants : Number
+        nbParticipants : Number,
+        participants : [{ UserId : String }]
     }]
 });
 

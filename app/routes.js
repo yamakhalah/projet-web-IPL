@@ -42,7 +42,7 @@ module.exports = function(app, passport) {
     app.get('/users', function(req, res) {
         var controller = controllers["user"]
 
-        controller.find(null, function(err, results) {
+        controller.find({password: { $exists: true }}, function(err, results) {
             if (err) {
                 res.json({
                     success: false,

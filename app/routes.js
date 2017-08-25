@@ -161,7 +161,70 @@ module.exports = function(app, passport) {
         })
     })
 
-    // GET all games by night where user are registered
+    // DELETE a game
+    app.delete('/game/:id', function(req, res) {
+        var controller = controllers["game"];
+        var id = req.params.id;
+
+        controller.delete(id, function(err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                success: true,
+                message: "the game has been deleted: " + id
+            })
+        })
+    });
+
+    // GET all games by night where user is in
+    app.get('/games/:idNight', function(req, res) {
+        // TODO
+        var controllerNight = controllers["night"];
+        var controllerGame = controllers["game"];
+        var idNight = req.params.idNight;
+
+        controllerNight.findById(idNight, function(err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+
+            var games = result.games;
+            var gamesToReturn = [];
+            games.forEach(function (game, index) {
+                controllerGame.findById(game._id, function(err, result) {
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: err
+                        })
+                        logger.info(err)
+                        return
+                    }
+
+                    gamesToReturn.push(result);
+                });
+            });
+            
+            res.json({
+                data: gamesToReturn,
+                success: true
+            });
+            
+        })
+    });
 
     /***************************************************
      * All the routes linked to the Login and signup ***
@@ -248,7 +311,7 @@ module.exports = function(app, passport) {
                 } else {
                   res.json({
                       success: true,
-                      message: "Le mail à bien été envoyé"
+                      message: "Email correctly send."
                   })
                 }
               }); 
@@ -289,6 +352,7 @@ module.exports = function(app, passport) {
 
     // GET all games of a night
     app.get('/nights/games/:id/', function(req, res) {
+        var id = req.params.id;
         var controller = controllers["night"]
 
         controller.findById(id, function(err, results) {

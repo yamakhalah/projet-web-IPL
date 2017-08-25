@@ -490,7 +490,29 @@ module.exports = function(app, passport) {
                 });
             })
         })
-    })
+    });
+
+    // GET : upcomming nights
+    app.get('/nights/upCommingNights', function(req, res) {
+        var dateNow = Date.now();
+        var controller = controllers["night"];
+
+        controller.find({ date : {$gt: dateNow}}, function(err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                });
+                logger.info(err);
+                return
+            }
+
+            res.json({
+                success: true,
+                data: result.sort({date: 1})
+            })
+        })
+    });
 
      // POST to change nights status
      // TODO

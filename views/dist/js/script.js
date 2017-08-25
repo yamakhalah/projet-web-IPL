@@ -34,18 +34,88 @@ $(document).ready(function() {
     $('#validateNightButton').click(function () {
     	var idPanel = $('div[class="tab-pane fade active in"]').attr('id');
         var newPanel = 0;
-        console.log("IdPanel -> " + idPanel);
+        
         switch(idPanel) {
             case "night1":
                 if ($('#formCreation').valid()) {
                     newPanel = 2;
                 }
                 break;
+
             case "night2":
-                newPanel = 3;
+                var inputCheckTabGames = $("#playable-games-table").find("input:checked");
+                if (inputCheckTabGames.length === 0) {
+                    newPanel = 2;
+                    Utils.notifyError("Veuillez sélectionner au moins un jeu !");
+                    break;
+                } else {
+                    newPanel = 3;
+                }
                 break;
+
             case "night3":
+
+                // Check all forms
+                // 1
+                if (! $('#formCreation').valid()) {
+                    newPanel = 1;
+                    Utils.notifyError("Veuillez corriger les erreurs indiquées !");
+                    break;
+                }
+                // 2
+                var inputTabGames = $("#playable-games-table").find("input:checked");
+                if (inputTabGames.length === 0) {
+                    newPanel = 2;
+                    Utils.notifyError("Veuillez sélectionner au moins un jeu !");
+                    break;
+                }
+
+                //3
+                var inputCheckTabGuests = $("#invite-guests-table").find("input:checked");
+                var countEmail = $('.inputInvitationEmail').length;
+                if (inputCheckTabGuests.length === 0 && countEmail === 0) {
+                    Utils.notifyError("Veuillez sélectionner au moins un user ou ajouter une adresse email !");
+                    break;
+                }
+
+
+                // 1 - Send ajax email non-user
+
+                var tabEmail = [];
+                var testEmail = /^[A-Z0-9._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}$/i;
+                $('.inputInvitationEmail').each(function() {
+                    if (testEmail.test($(this).val())) {
+                        tabEmail.push($(this).val());
+                    }
+                });
+
+                // Contains non-user + user
+                var guests = new Array();
+
+                if (tabEmail.length != 0) {
+                    $.ajax({
+                        url: "/users/addUsersByMail",
+                        type: "post",
+                        data: JSON.stringify(tabEmail),
+                        success: function(data, status, jqXHR) {
+                            Utils.notifySucces('Email envoyé');
+                            console.log(data);
+                            for (var i = 0; i < data.length; i++) {
+                                var guest = {
+                                    id : tr.attr('id'),
+                                    isValidated : false
+                                }
+                                guests.push(guest);
+                            }
+                        }, error: function(jqXHR, status, err) {
+                            Utils.notifyError('Problème envoie email user non inscrit');
+                        }
+                    });
+                }
+
+                // 2 - Create Night
                 var night = formToJson('formCreation');
+                console.log(night);
                 var date = moment(night['date'], 'DD/MM/YYYY');
                 night['date'] = new Date(date.valueOf());
                 night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
@@ -53,53 +123,40 @@ $(document).ready(function() {
 
                 // Fetch the games chosen for the night
                 var games = new Array();
-                var i = 0;
-                $("#playable-games-table").find("input:checked").each(function() {
-                    var tr = $(this).closest('tr');
-                    games[i] = {
-                        id : tr.attr('id'),
+                for (var i=0; i < inputTabGames.length; i++) {
+                    var game = {
+                        id : $(inputTabGames[i]).attr('id'),
                         nbParticipants : 0
                     }
-                    i++;
-                });
-                if (i == 0) {
-                    Utils.notifyError('Veuillez sélectionner au moins un jeu');
-                } else {
-                    // Fetch the guests to invite
-                    var guests = new Array();
-                    i = 0;
-                    $("#invite-guests-table").find("input:checked").each(function() {
-                        var tr = $(this).closest('tr');
-                        guests[i] = {
-                            id : tr.attr('id'),
-                            isValidated : false
-                        }
-                        i++;
-                    });
-
-                    if (i == 0) {
-                        Utils.notifyError('Veuillez sélectionner au moins un invité');
-                    } else {
-                        night['games'] = games;
-                        night['guests'] = guests;
-                        
-                        $.ajax({
-                            url: "/night",
-                            type: "post",
-                            data: night,
-                            success: function(data, status, jqXHR) {
-                                if (! data.success) {
-                                    Utils.notifyError(data.message);
-                                } else {
-                                    Utils.notifySucces("La soirée a bien été créée");
-                                }
-                            }, error: function(jqXHR, status, err) {
-                                Utils.notifyError(status);
-                            }
-                        });
-                    }
+                    games.push(game);
                 }
-                // On reteste tous les formulaires avant, verifier qu'il n'y a pas eu de mofis
+                
+                // Fetch the guests to invite
+                for (var j=0; j < inputCheckTabGuests.length; j++) {
+                    var guest = {
+                        id : $(inputCheckTabGuests[j]).attr('id'),
+                        isValidated : false
+                    }
+                    guests.push(guest);
+                }
+                
+                night['games'] = games;
+                night['guests'] = guests;
+                
+                $.ajax({
+                    url: "/night",
+                    type: "post",
+                    data: night,
+                    success: function(data, status, jqXHR) {
+                        if (! data.success) {
+                            Utils.notifyError(data.message);
+                        } else {
+                            Utils.notifySucces("La soirée a bien été créée");
+                        }
+                    }, error: function(jqXHR, status, err) {
+                        Utils.notifyError(status);
+                    }
+                });                
                 break;
         }
 
@@ -119,9 +176,6 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.butDeleteRowEmail', function() {
-        alert("oui");
-        console.log(this);
-        console.log($(this).closest('.pInvitationEmail'));
         $(this).closest('.pInvitationEmail').remove();
     })
 
@@ -167,7 +221,23 @@ var functionsAfterConnection = function() {
                     var endTime = moment(data.endTime);
                     return startTime.format("HH:mm") + " - " + endTime.format("HH:mm")
                 },
+                "targets": 1
+            },
+            {
+                "render": function ( data, type, row ) {
+                    console.log(data);
+                    return data.name
+                },
                 "targets": 2
+            },
+            {
+                "render": function ( data, type, row ) {
+                    console.log(data);
+                    console.log(type);
+                    console.log(row);
+                    return data.description
+                },
+                "targets": 3
             },
             {
                 "render": function (data, type, row) {
@@ -178,13 +248,20 @@ var functionsAfterConnection = function() {
                     toReturn += "</ul>";
                     return toReturn
                 },
-                "targets": 3
+                "targets": 4
             },
             {
                 "render": function (data, type, row) {
-                    return "<button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> Valider</button>"
+                    
+                    return toReturn
                 },
                 "targets": 4
+            },
+            {
+                "render": function (data, type, row) {
+                    return "<button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> S'inscrire</button>"
+                },
+                "targets": 6
             }
         ]
     initDatatable("invitations-table", "/user-nights", nightsColumns, nightsColumnDefs);
@@ -200,6 +277,7 @@ var gameNightHandler = function() {
     var playableGamesColumns = [
             {"data": null, "visible": true, "orderable": false},
             {"data": "name", "visible": true, "searchable": true},
+            {"data": "description", "visible": true, "searchable": true},
             {"data": null, "visible": true, "searchable": true}
         ];
     var playableGamesColumnDefs = [
@@ -213,7 +291,7 @@ var gameNightHandler = function() {
                 "render": function (data, type, row) {
                     return data.minPlayers + " / " + data.maxPlayers
                 },
-                "targets": 2
+                "targets": 3
             }
         ]
     playableGamesTable = initDatatable("playable-games-table", "/games", playableGamesColumns, playableGamesColumnDefs);
@@ -391,7 +469,7 @@ var gamesHandler = function() {
             },
             {
                 "render": function ( data, type, row ) {
-                    return '<button type="button" class="btn btn-default btn-sm"><i class="fa fa-trash"></i></button>';
+                    return '<button type="button" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>';
                 },
                 "targets": 4
             }

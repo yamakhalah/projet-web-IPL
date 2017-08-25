@@ -201,9 +201,8 @@
         </div>
     </div>
 
-    <div id="divInvitations" class="container" style="display: none;z-index: 100; margin-top: 150px;">
+    <div id="divInvitations" class="container" style="display: none;z-index: 100;">
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
                 <div class="panel-default panel panel-primary" style="margin-top: 100px">
                     <div class="panel-heading"
                          style="display: flex; align-items: center; justify-content: center;">
@@ -214,16 +213,17 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Description</th>
                                 <th>Heure</th>
+                                <th>Nom</th>
+                                <th>Description</th>
                                 <th>Jeux</th>
-                                <th>Actions</th>
+                                <th>Nbr. participants</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </div>
-            </div>
         </div>
     </div>
 
@@ -314,6 +314,7 @@
                                             <tr>
                                                 <th style="text-align: center;"><input type="checkbox" name="selectAll" id="selectAll"></th>
                                                 <th style="text-align: center;">Nom</th>
+                                                <th>Description</th>
                                                 <th style="text-align: center;">Min/Max</th>
                                             </tr>
                                         </thead>
@@ -439,7 +440,7 @@
             <div class="col-md-8">
                 <div class="panel-default panel panel-primary" style="margin-top: 100px">
                     <div class="panel-body">
-                        <table id="gamesTable" class="table table-bordered" style="width: 100%;">
+                        <table id="gamesTable" class="table table-striped responsive" style="width:100%;stycellspacing=0;">
                             <thead>
                             <tr>
                                 <th>Image</th>

@@ -628,7 +628,6 @@ module.exports = function(app, passport) {
         data.push({ value : req.body.date, title : 'la date' });
         data.push({ value : req.body.startTime, title : 'l\'heure de début' });
         data.push({ value : req.body.endTime, title : 'l\'heure de fin' });
-        data.push({ value : req.body.description, title : 'la description' });
         var check = checkData(data);
         if (! check.success) {
             res.json(check);

@@ -161,6 +161,28 @@ module.exports = function(app, passport) {
         })
     })
 
+    //POST update a game
+    app.post('/game/update/:id', function(req, res) {
+        var controller = controllers["game"];
+        var id = req.params.id;
+
+        controller.update(id, req.body, function(err, reuslt) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                });
+                logger.info(err);
+                return
+            }
+
+            res.json({
+                success: true,
+                message: "The game has been successfully updated"
+            })
+        });
+    });
+
     // DELETE a game
     app.delete('/game/:id', function(req, res) {
         var controller = controllers["game"];

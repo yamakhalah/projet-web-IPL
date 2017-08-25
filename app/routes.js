@@ -163,6 +163,17 @@ module.exports = function(app, passport) {
 
     //POST update a game
     app.post('/game/update/:id', function(req, res) {
+        var data = Array();
+        data.push({ value : req.body.name, title : 'le nom' });
+        data.push({ value : req.body.description, title : 'la description' });
+        data.push({ value : req.body.minPlayers, title : 'le nombre de joueurs minimum' });
+        data.push({ value : req.body.maxPlayers, title : 'le nombre de joueurs maximum' });
+        var check = checkData(data);
+        if (! check.success) {
+            res.json(check);
+            return;
+        }
+
         var controller = controllers["game"];
         var id = req.params.id;
 
@@ -371,7 +382,6 @@ module.exports = function(app, passport) {
         })
     });*/
 
-
     // GET all games of a night
     app.get('/nights/games/:id/', function(req, res) {
         var id = req.params.id;
@@ -394,8 +404,97 @@ module.exports = function(app, passport) {
         });
     });
 
+    // POST update : add a participants to a game
+    app.post('/nights/addParticipant/:idNight/:idGame', function(res, req) {
+        var controller = controllers["night"];
+        var idNight = req.params.idNight;
+        var idGame = req.params.idGame;
+
+        controller.findById(idNight, function (err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                });
+                logger.info(err);
+                return
+            }
+            var user = Array();
+            user.push({ userId : req.user._id });
+
+            var index = result.games.findIndex(function (game) {
+                if (game._id == idGame) {
+                    return game;
+                }
+            });
+
+            result.games[index].participants.push(user);
+
+            controller.update(result._id, result, function(err, result) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        message: err
+                    });
+                    logger.info(err);
+                    return
+                }
+
+                res.json({
+                    success: true,
+                    message: "User added to the game"
+                });
+            })
+        })
+    });
+
+    // POST update : delete a participants to a game
+    app.post('/nights/deleteParticipant/:idNight/:idGame', function(res, req) {
+        var controller = controllers["night"];
+        var idNight = req.params.idNight;
+        var idGame = req.params.idGame;
+
+        controller.findById(idNight, function (err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                });
+                logger.info(err);
+                return
+            }
+            var user = Array();
+            user.push({ userId : req.user._id });
+
+            var index = result.games.findIndex(function (game) {
+                if (game._id == idGame) {
+                    return game;
+                }
+            });
+
+            result.games[index].participants.splice(index, 1);
+
+            controller.update(result._id, result, function(err, result) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        message: err
+                    });
+                    logger.info(err);
+                    return
+                }
+
+                res.json({
+                    success: true,
+                    message: "User added to the game"
+                });
+            })
+        })
+    })
+
      // POST to change nights status
-    app.post('/nights/:id', function(req, res) {
+     // TODO
+    app.post('/nights/:id/:status', function(req, res) {
         var controller = controllers["night"]
 
         controller.update(id, req.body, function(err, results) {

@@ -10,6 +10,8 @@ GET /users : Renvoie tous les users dans une array
 
 GET /user/:id : Renvoie un user par rapport à son id
 
+POST /users/addUsersByMail : Ajoute les users invités par mail, les ajoute en DB et renvoie une liste d'id et une liste de mail
+
 ----- GAMES -------------------------- 
 
 GET /games : Renvoie tous les jeux dans une array

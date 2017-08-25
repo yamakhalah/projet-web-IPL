@@ -82,6 +82,28 @@ module.exports = function(app, passport) {
         })
     });
 
+    //POST : update user
+    app.post('user/update/:id', function (req, res) {
+        var controller = controllers["user"];
+        var id = req.params.id;
+
+        controller.update(id, req.body, function(err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({
+                success: true,
+                data: result
+            })
+        });
+    });
+
     // POST : add users by mail
     app.post('/users/addUsersByMail', function(req, res) {
         var controller = controllers["user"];

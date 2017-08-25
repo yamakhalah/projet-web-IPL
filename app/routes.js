@@ -81,6 +81,67 @@ module.exports = function(app, passport) {
             })
         })
     });
+
+    // POST : add users by mail
+    app.post('/users/addUsersByMail', function(req, res) {
+        var controller = controllers["user"];
+        var usersArray = Array();
+        var emailsArray = Array();
+        var itemsCount = 0;
+
+        req.body.forEach(function(emailUser, index) {
+            controller.find({ email: emailUser }, function(err, resultFind) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        message: err
+                    })
+                    logger.info(err)
+                    return
+                }
+
+                if (resultFind.length === 0) {
+                    console.log(itemsCount);
+                    var user = { email: emailUser }
+                    controller.create(user, function(err, result) {
+                        
+                        if (err) {
+                            res.json({
+                                success: false,
+                                message: err
+                            })
+                            logger.info(err)
+                            return
+                        }
+
+                        usersArray.push(result._id);
+                        emailsArray.push({ id: result._id, email: result.email });
+
+                        itemsCount++;
+                        if (itemsCount === req.body.length) { 
+                            res.json({
+                                userIds: usersArray,
+                                userEmails: emailsArray
+                            });
+                        }
+                    });
+                } else {
+                    usersArray.push(resultFind[0]._id);
+                    itemsCount++;
+                }
+
+                if (itemsCount === req.body.length) {                  
+                    res.json({
+                        userIds: usersArray,
+                        userEmails: emailsArray
+                    });
+                }
+            });
+
+            console.log(usersArray);
+            
+        });
+    })
     
     /****************************************
      * All the routes linked to the Games ***
@@ -429,6 +490,7 @@ module.exports = function(app, passport) {
             });
 
             result.games[index].participants.push(user);
+            result.games[index].nbParticipants++;
 
             controller.update(result._id, result, function(err, result) {
                 if (err) {
@@ -473,6 +535,7 @@ module.exports = function(app, passport) {
             });
 
             result.games[index].participants.splice(index, 1);
+            result.games[index].nbParticipants--;
 
             controller.update(result._id, result, function(err, result) {
                 if (err) {

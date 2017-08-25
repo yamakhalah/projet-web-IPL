@@ -26,7 +26,7 @@ module.exports = function(app, passport) {
         res.redirect('/');
     });
 
-    app.get('/isAuthenicated', function(req, res) {
+    app.get('/isAuthenticated', function(req, res) {
         if (req.isAuthenticated()) {
             logger.info("oui");
             res.status(200).send({ success: "logged in" });
@@ -216,49 +216,6 @@ module.exports = function(app, passport) {
         })
     });
 
-    // GET all games by night where user is in
-    app.get('/games/:idNight', function(req, res) {
-        // TODO
-        var controllerNight = controllers["night"];
-        var controllerGame = controllers["game"];
-        var idNight = req.params.idNight;
-
-        controllerNight.findById(idNight, function(err, result) {
-            if (err) {
-                res.json({
-                    success: false,
-                    message: err
-                })
-                logger.info(err)
-                return
-            }
-
-
-            var games = result.games;
-            var gamesToReturn = [];
-            games.forEach(function (game, index) {
-                controllerGame.findById(game._id, function(err, result) {
-                    if (err) {
-                        res.json({
-                            success: false,
-                            message: err
-                        })
-                        logger.info(err)
-                        return
-                    }
-
-                    gamesToReturn.push(result);
-                });
-            });
-            
-            res.json({
-                data: gamesToReturn,
-                success: true
-            });
-            
-        })
-    });
-
     /***************************************************
      * All the routes linked to the Login and signup ***
      **************************************************/
@@ -315,7 +272,7 @@ module.exports = function(app, passport) {
      * All the routes linked to the Emails **
      ***************************************/
     // POST send all the emails of unregistered users
-    app.post('/emails/sendEmails', function(req, res) {
+    app.post('/emails/sendEmailsToUnregisteredUser', function(req, res) {
         req.body.users.forEach(function(user, index) {
             var transporter = nodemailer.createTransport({
                 service: 'gmail',
@@ -383,8 +340,8 @@ module.exports = function(app, passport) {
     });*/
 
     // GET all games of a night
-    app.get('/nights/games/:id/', function(req, res) {
-        var id = req.params.id;
+    app.get('/night/:idNight/games/', function(req, res) {
+        var id = req.params.idNight;
         var controller = controllers["night"]
 
         controller.findById(id, function(err, results) {
@@ -404,8 +361,51 @@ module.exports = function(app, passport) {
         });
     });
 
+    // GET all games by night where user is in
+    app.get('/night/findByAuthenticatedUser/:idNight', function(req, res) {
+        // TODO
+        var controllerNight = controllers["night"];
+        var controllerGame = controllers["game"];
+        var idNight = req.params.idNight;
+
+        controllerNight.findById(idNight, function(err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+
+            var games = result.games;
+            var gamesToReturn = [];
+            games.forEach(function (game, index) {
+                controllerGame.findById(game._id, function(err, result) {
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: err
+                        })
+                        logger.info(err)
+                        return
+                    }
+
+                    gamesToReturn.push(result);
+                });
+            });
+            
+            res.json({
+                data: gamesToReturn,
+                success: true
+            });
+            
+        })
+    });
+
     // POST update : add a participants to a game
-    app.post('/nights/addParticipant/:idNight/:idGame', function(res, req) {
+    app.post('/night/:idNight/addParticipant/:idGame', function(res, req) {
         var controller = controllers["night"];
         var idNight = req.params.idNight;
         var idGame = req.params.idGame;
@@ -449,7 +449,7 @@ module.exports = function(app, passport) {
     });
 
     // POST update : delete a participants to a game
-    app.post('/nights/deleteParticipant/:idNight/:idGame', function(res, req) {
+    app.post('/night/:idNight/deleteParticipant/:idGame', function(res, req) {
         var controller = controllers["night"];
         var idNight = req.params.idNight;
         var idGame = req.params.idGame;

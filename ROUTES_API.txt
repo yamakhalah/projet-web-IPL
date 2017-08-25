@@ -1,0 +1,55 @@
+GET / : index.html
+
+GET /logout : logout du user
+
+GET /isAuthenticated : Vérifie si l'utilisateur est connecté
+
+----- USERS --------------------------
+
+GET /users : Renvoie tous les users dans une array
+
+GET /user/:id : Renvoie un user par rapport à son id
+
+----- GAMES -------------------------- 
+
+GET /games : Renvoie tous les jeux dans une array
+
+GET /game/:id : Renvoie un jeu par rapport à son id
+
+POST /game : Enregistre un jeu (body => game)
+
+POST /game/update/:id : Met jour un jeu (body => game)
+
+DELETE /game/:id : Supprime un jeu
+
+----- LOGIN & SIGNUP ------------------
+
+POST /login : Connexion d'un utilisateur (body => user)
+
+POST /signup : Enregistrement d'un utilisateur (body => user)
+
+----- EMAIL ----------------------------
+
+POST /emails/sendEmailsToUnregisteredUser : Envoie un mail à tous les utilisateurs non enregistrés (body => Array de users)
+
+POST /emails/sendConfirmationEmails : Envoie un mail de confirmation de la soirée à tous les uilisateurs validée
+
+----- NIGHTS ---------------------------
+
+GET /nights/:hostId : Renvoie toutes les soirées de l'utilisateur hostId dans un array
+
+GET /night/:idNight/games : Renvoie tous les jeux d'une soirée dans un array
+
+GET /night/findByAuthenticatedUser/:idNight : Renvoie tous les jeux d'une soirée où l'utilisateur connecté est inscrit dans une array
+
+POST /night/:idNight/addParticipant/:idGame : Ajouter l'utilisateur connecté à un jeu d'une soirée (Body => null)
+
+POST /night/:idNight/deleteParticipant/:idGame : Supprimer l'utilisateur connecté à un jeu d'une soirée (Body => null)
+
+GET /nights/upCommingNights : Renvoie toutes les soirées à venir par ordre de date dans un array
+
+POST /nights/:idNight/:status : Change le statut d'une soirée par le statut indiqué (body => null)
+
+POST /night : Enregister un soirée (body => night)
+
+GET /user-nights : Renvoie toutes les soirées ou l'utilisateur a été invité dans un array

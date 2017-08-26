@@ -402,17 +402,10 @@ module.exports = function(app, passport) {
         
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
-                res.json({
-                    success: false,
-                    message: "Couldn't send email to " + user.email
-                })
                 logger.info(err)
-                return
+                return "Couldn't send email to " + user.email;
             } else {
-              res.json({
-                  success: true,
-                  message: "Email correctly send."
-              })
+              return "Email correctly send.";
             }
         }); 
     };
@@ -436,17 +429,10 @@ module.exports = function(app, passport) {
         
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
-                res.json({
-                    success: false,
-                    message: "Couldn't send email to " + user.email
-                })
                 logger.info(err)
-                return
+                return "Couldn't send email to " + user.email;
             } else {
-              res.json({
-                  success: true,
-                  message: "Email correctly send."
-              })
+              return "Email correctly send.";
             }
         }); 
     };
@@ -1076,11 +1062,15 @@ module.exports = function(app, passport) {
 
             req.body.guests.forEach(function(user, index) {
                 controller.findById(user.id, function(err, result) {
+                    var message;
                     if (result.hasOwnProperty('password')) {
-                        sendEmailsToRegisteredUser(result);
+                        message = sendEmailsToRegisteredUser(result);
                     } else {
-                        sendEmailsToUnregisteredUser(result);
+                        message =sendEmailsToUnregisteredUser(result);
                     }
+                    res.json({
+                        message: message
+                    })
                 })
             });
         });
@@ -1089,6 +1079,7 @@ module.exports = function(app, passport) {
     // Fetch the nights to which the connected user was invited
     app.get('/user-nights', function(req, res) {
         var controller = controllers["night"]
+        var dateNow = Date.now();
 
         controller.findByDate({"guests": {$elemMatch: {id: req.user._id.toString()}}}, function(err, nights) {
             if (err) {
@@ -1113,6 +1104,23 @@ module.exports = function(app, passport) {
                     ids.push(mongoose.Types.ObjectId(game.id));
                 }
 
+                if (night.date < dateNow) {
+                    night.status = constants.FINISHED_NIGHT;
+
+                    controller.update(night._id, night, function (err, result) {
+                        if (err) {
+                            res.json({
+                                success: false,
+                                message: err
+                            })
+                            logger.info(err)
+                            return
+                        }
+                    });
+
+                    console.log(night);
+                }
+
                 controller.find({
                     '_id' : {$in : ids}
                 }, function(err, games) {
@@ -1132,7 +1140,7 @@ module.exports = function(app, passport) {
                     i++;
                     if (i == nights.length) {
                         res.json({
-                            data: toReturn,
+                            data: toReturn.sort({ date : 1}),
                             success: true
                         })
                     }

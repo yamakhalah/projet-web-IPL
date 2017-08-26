@@ -119,11 +119,11 @@ $(document).ready(function() {
                 if (regex.test(night['date'])){
                     var date = moment(night['date'], 'YYYY-MM-DD');
                 } else {
-                    var date = moment(night['date'], 'DD/MM/YYYY');
+                    var date = moment(night['date'], 'MM/DD/YYYY');
                 }
                 night['date'] = new Date(date.valueOf());
-                night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
-                night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0000 2017");
+                night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0200 2017");
+                night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0200 2017");
                 night['status'] = "CREATED";
 
                 // Fetch the games chosen for the night
@@ -149,6 +149,8 @@ $(document).ready(function() {
                 night['games'] = games;
                 night['guests'] = guests;
                 
+                console.log(night);
+
                 $.ajax({
                     url: "/night",
                     type: "post",
@@ -242,13 +244,23 @@ var functionsAfterConnection = function() {
 
                     $(clone).find('.panel-body tbody').first().html("");
                     for (var game of night.games) {
-                        toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
+                        if (night.status !== "FINISHED") {
+                            toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
                             + "<td>" + game.minPlayers + "</td>"
                             + "<td>" + game.maxPlayers + "</td>"
                             + "<td>" + night.nbParticipants[j] + "</td>"
                             + "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> S'inscrire</button></td>"
-                            + "</tr>"
+                            + "</tr>";   
+                        } else {
+                            toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
+                            + "<td>" + game.minPlayers + "</td>"
+                            + "<td>" + game.maxPlayers + "</td>"
+                            + "<td>" + night.nbParticipants[j] + "</td>"
+                            + "<td style='text-align: center;'>FINI</td>"
+                            + "</tr>";
+                        }
                         $(clone).find('.panel-body tbody').first().append(toAdd);
+
                         j++;
                     }
                     

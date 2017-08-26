@@ -451,7 +451,7 @@ module.exports = function(app, passport) {
         }); 
     };
 
-    var sendConfirmationEmails = function(user, night) {
+    var sendConfirmationEmails = function(user, night, game) {
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -464,23 +464,15 @@ module.exports = function(app, passport) {
             from: 'night.game.ipl@gmail.com',
             to: user.email,
             subject: 'Confirmation à une soirée jeux via night-game',
-            text: 'La soirée du ' + night.date.toISOString().substring(0, 10) + ' a été confirmé !\nVeuillez vous connecter au site pour accèder à la soirée en question.'
+            text: 'La soirée du ' + night.date.toISOString().substring(0, 10) + ' a été confirmé pour le jeu ' + game.name + ' !\nVeuillez vous connecter au site pour accèder à la soirée en question.'
                 + '\n\nA bientôt sur night-game.' 
         };
         
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
-                res.json({
-                    success: false,
-                    message: "Couldn't send email to " + user.email
-                })
-                logger.info(err)
-                return
+                return "Couldn't send mail."
             } else {
-              res.json({
-                  success: true,
-                  message: "Email correctly send."
-              })
+                return "Email correctly send.";
             }
         }); 
     }
@@ -675,7 +667,7 @@ module.exports = function(app, passport) {
             console.log(req.user._id);
 
             var index = result.games.findIndex(function (game) {
-                if (game.userId === idGame) {
+                if (game.id === idGame) {
                     console.log(game);
                     return game;
                 }
@@ -684,7 +676,7 @@ module.exports = function(app, passport) {
             console.log(index);
 
             var indexUser = result.games[index].participants.findIndex(function (user) {
-                if (user._id === req.user._id) {
+                if (user.userId === req.user._id) {
                     return user;
                 }
             });
@@ -766,7 +758,7 @@ module.exports = function(app, passport) {
             user.push({ userId : req.user._id });
 
             var index = result.games.findIndex(function (game) {
-                if (game._id == idGame) {
+                if (game.id == idGame) {
                     return game;
                 }
             });
@@ -824,7 +816,7 @@ module.exports = function(app, passport) {
     });
 
      // POST to change nights status
-     // TODO
+     // DO NOT USE !!!!!!!!!!
     app.post('/nights/:id/:status', function(req, res) {
         var controller = controllers["night"]
 
@@ -843,6 +835,113 @@ module.exports = function(app, passport) {
                 success: true
             })
         })
+    });
+
+    // POST Confirm game & night
+    app.post('night/:idNight/confirm/:idGame', function(req, res) {
+        var controllerNight = controllers["night"];
+        var controllerGame = controllers["game"];
+        var controllerUser = controllers["user"];
+        var idNight = req.params.idNight;
+        var idGame = req.params.idGame;
+
+        controllerNight.findById(idNight, function(err, night) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            var index = night.games.findIndex(function (game) {
+                if (game.id == idGame) {
+                    return game;
+                }
+            });
+
+            if (index !== -1) {
+                night.games[index].isValidated = true;
+
+                night.status = constants.CONFIRMED_NIGHT;
+
+                controllerGame.findById(idGame, function (err, game) {
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: err
+                        })
+                        logger.info(err)
+                        return
+                    }
+
+                    controllerNight.update(idNight, night, function (err, result) {
+                        if (err) {
+                            res.json({
+                                success: false,
+                                message: err
+                            })
+                            logger.info(err)
+                            return
+                        }
+
+                        night.guests.forEach(function(user, i) {
+                            if (user.isValidated === true) {
+                                controllerUser.findById(user.id, function(err, userDB) {
+                                    var message = sendConfirmationEmails(userDB, night, game);
+                                    res.json({
+                                        success: true,
+                                        message: message
+                                    })
+                                });
+                            }
+                        });
+
+                        res.json({
+                            success: true,
+                            message: "Soirée mise à jour"
+                        });
+                    });
+                });
+            } else {
+                res.json({
+                    message: "Ce jeu n'existe pas dans cette soirée."
+                })
+            } 
+        });
+    });
+
+    // POST Cancel a night
+    app.post('night/:idNight/cancel', function(req, res) {
+        controllerNight.findById(idNight, function(err, night) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            night.status = constants.CANCELLED_NIGHT;
+
+            controllerNight.update(idNight, night, function (err, result) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        message: err
+                    })
+                    logger.info(err)
+                    return
+                }
+
+                res.json({
+                    success: true,
+                    message: "Soirée mise à jour."
+                });
+            });
+        });
     });
 
     // POST a night

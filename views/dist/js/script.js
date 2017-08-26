@@ -18,18 +18,16 @@ $(document).ready(function() {
 
             var id = getQueryStringValue("id");         
             if (id !== null && id !== "") {
-                console.log(id);
                 Utils.toggleDiv('divInscription');
 
                 $.ajax({
                     url: "/user/" + id,
                     type: "get",
                     success: function(data, status, jqXHR) {
-                        console.log(data);
                         $('#formInscription [name="email"]').val(data.result.email);
                     },
                     error: function(jqXHR, status, err) {
-                        console.log(err);
+                        Utils.notifyError(err);
                     }
                 });
             }
@@ -229,7 +227,7 @@ $(document).ready(function() {
                         location.reload();
                     }, 1000);
                 }, error(jqXHR, status, err) {
-                    notifyError(err);
+                    Utils.notifyError(err);
                 }
             });
         }
@@ -238,7 +236,7 @@ $(document).ready(function() {
     $("#nights-panels").on('click', '.cancel', function() {
         var panel = $(this).closest('.panel');
         $.ajax({
-            url: "/night/$(panel).attr('id')/cancel",
+            url: "/night/" + $(panel).attr('id') + "/cancel",
             type: "post",
             success: function(data, status, jqXHR) {
                 Utils.notifySucces("La soirée a bien été annulée");
@@ -246,10 +244,10 @@ $(document).ready(function() {
                     location.reload();
                 }, 1000);
             }, error(jqXHR, status, err) {
-                notifyError(err);
+                Utils.notifyError(err);
             }
         });
-    }
+    })
 });
 
 // Add here the methods and events that should happen after the user is connected
@@ -350,7 +348,6 @@ var functionsAfterConnection = function() {
 
                     $(clone).find('.panel-body tbody').first().html("");
 
-                    console.log(night.validateds);
                     for (var game of night.games) {
                         toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
                             + "<td class='minPlayers' nb='" + game.minPlayers + "'>" + game.minPlayers + "</td>"

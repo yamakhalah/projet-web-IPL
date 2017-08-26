@@ -227,13 +227,23 @@ var functionsAfterConnection = function() {
 
                     $(clone).find('.panel-body tbody').first().html("");
                     for (var game of night.games) {
-                        toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
+                        if (night.status !== "FINISHED") {
+                            toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
                             + "<td>" + game.minPlayers + "</td>"
                             + "<td>" + game.maxPlayers + "</td>"
                             + "<td>" + night.nbParticipants[j] + "</td>"
                             + "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> S'inscrire</button></td>"
-                            + "</tr>"
+                            + "</tr>";   
+                        } else {
+                            toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
+                            + "<td>" + game.minPlayers + "</td>"
+                            + "<td>" + game.maxPlayers + "</td>"
+                            + "<td>" + night.nbParticipants[j] + "</td>"
+                            + "<td style='text-align: center;'>FINI</td>"
+                            + "</tr>";
+                        }
                         $(clone).find('.panel-body tbody').first().append(toAdd);
+
                         j++;
                     }
                     

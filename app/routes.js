@@ -1043,6 +1043,7 @@ module.exports = function(app, passport) {
     // Fetch the nights to which the connected user was invited
     app.get('/user-nights', function(req, res) {
         var controller = controllers["night"]
+        var dateNow = Date.now();
 
         controller.findByDate({"guests": {$elemMatch: {id: req.user._id.toString()}}}, function(err, nights) {
             if (err) {
@@ -1065,6 +1066,23 @@ module.exports = function(app, passport) {
                 for (let game of night.games) {
                     nbParticipants.push(game.nbParticipants);
                     ids.push(mongoose.Types.ObjectId(game.id));
+                }
+
+                if (night.date < dateNow) {
+                    night.status = constants.FINISHED_NIGHT;
+
+                    controller.update(night._id, night, function (err, result) {
+                        if (err) {
+                            res.json({
+                                success: false,
+                                message: err
+                            })
+                            logger.info(err)
+                            return
+                        }
+                    });
+
+                    console.log(night);
                 }
 
                 controller.find({

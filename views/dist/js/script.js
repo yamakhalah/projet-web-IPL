@@ -15,7 +15,11 @@ $(document).ready(function() {
             Init.navUser();
         }, error: function(jqXHR, status, err) {
             $("#divConnexion").show();
-
+        }
+    }).done(function (){
+        if (connected) {
+            functionsAfterConnection();
+        } else {
             var id = getQueryStringValue("id");         
             if (id !== null && id !== "") {
                 console.log(id);
@@ -33,10 +37,6 @@ $(document).ready(function() {
                     }
                 });
             }
-        }
-    }).done(function (){
-        if (connected) {
-            functionsAfterConnection();
         }
     });
 
@@ -166,8 +166,6 @@ $(document).ready(function() {
                 
                 night['games'] = games;
                 night['guests'] = guests;
-                
-                console.log(night);
 
                 $.ajax({
                     url: "/night",
@@ -208,6 +206,24 @@ $(document).ready(function() {
     $('#navJeux').click(function() {
         $('#section-jeux').attr('style', 'display:block');
     })
+
+    $("#nights-panels").on('click', '.validate', function() {
+        var panel = $(this).closest('.panel');
+        var tr = $(this).closest('tr');
+
+        $.ajax({
+            url: "night/" + $(panel).attr('id') + "/confirm/" + $(tr).attr('id'),
+            type: "post",
+            success: function(data, status, jqXHR) {
+                Utils.notifySucces("La soirée a bien été validée");
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            }, error() {
+
+            }
+        });
+    })
 });
 
 // Add here the methods and events that should happen after the user is connected
@@ -225,7 +241,6 @@ var functionsAfterConnection = function() {
                 Utils.notifyError(data.message);
             } else {
                 var nights = data.data;
-                console.log(nights);
                 var i = 0;
                 for (var night of nights) {
                     var clone = $("#toClone").clone();
@@ -274,6 +289,67 @@ var functionsAfterConnection = function() {
                 }
                 while (i >= 0) {
                     $("#invite-table-" + i).DataTable();
+                    i--;
+                }
+            }
+        }, error: function(jqXHR, status, err) {
+            Utils.notifyError(status);
+        }
+    });
+
+    $.ajax({
+        url: "/nights/user",
+        type: "get",
+        success: function(data, status, jqXHR) {
+            if (! data.success) {
+                Utils.notifyError(data.message);
+            } else {
+                var nights = data.data;
+                var i = 0;
+                for (var night of nights) {
+                    var clone = $("#toClone").clone();
+
+                    $(clone).removeAttr('id');
+
+                    var date = moment(night.date);
+                    var startTime = moment(night.startTime);
+                    var endTime = moment(night.endTime);
+
+                    var toAdd = date.format("DD / MM / YYYY") + " : " + night.name + " de " + startTime.format("HH:mm") + " à " + endTime.format("HH:mm");
+                    $(clone).find('.panel-heading').html("").append(toAdd);
+
+                    $(clone).find('.panel').first().attr('id', night.id);
+
+                    var j = 0;
+
+                    $(clone).find('.panel-body tbody').first().html("");
+
+                    for (var game of night.games) {
+                        toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
+                            + "<td>" + game.minPlayers + "</td>"
+                            + "<td>" + game.maxPlayers + "</td>"
+                            + "<td>" + night.nbParticipants[j] + "</td>";
+                        if (! game.validated) {
+                            toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> Valider</button></td>"
+                        } else {
+                            if (game.validateds[j]) {
+                                toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success cancel'><i class='fa fa-check'></i> Annuler</button></td>"
+                            }
+                        }
+                        + "</tr>"
+                        $(clone).find('.panel-body tbody').first().append(toAdd);
+                        j++;
+                    }
+                    
+                    $(clone).find('.panel-body table').first().attr('id', "night-table-" + i);
+                    
+                    i++;
+
+                    $(clone).removeAttr('hidden');
+                    $("#nights-panels").append(clone);
+                }
+                while (i >= 0) {
+                    $("#night-table-" + i).DataTable();
                     i--;
                 }
             }
@@ -447,6 +523,7 @@ var nightsIncomming = function() {
         {"data": null, "visible": true, "searchable": true},
         {"data": null, "visible": true, "searchable": true},
         {"data": "name", "visible": true, "searchable": true},
+        {"data": "game.name", "visible": true, "searchable": true},
         {"data": "nbParticipants", "visible": true, "searchable": true},
         {"data": null, "visible": true, "orderable": false}
 
@@ -476,22 +553,16 @@ var nightsIncomming = function() {
         },
         {
             "render": function (data, type, row) {
-                return ;
-            },
-            "targets": 4
-        },
-        {
-            "render": function (data, type, row) {
                 if (data.status == "CONFIRMED")
                     return "<i class='fa fa-check' style='color: green;'></i>";
                 else
                     return "<i class='fa fa-times' style='color: tomato;'></i>"
             },
-            "targets": 5
+            "targets": 6
         }
     ];
 
-    initDatatable("nights-resume-table", "/nights/upCommingNights", nightsIncommingColumns, nightsIncommingColumnDefs);
+    initDatatable("nights-resume-table", "/upCommingNights", nightsIncommingColumns, nightsIncommingColumnDefs);
 
 }
 

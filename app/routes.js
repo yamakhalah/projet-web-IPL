@@ -29,10 +29,8 @@ module.exports = function(app, passport) {
     app.get('/isAuthenticated', function(req, res) {
         logger.info("dedans?");
         if (req.isAuthenticated()) {
-            logger.info("ici?");
             res.status(200).send({ success: "logged in" });
         } else {
-            logger.info("Ou la?");
             res.status(400).send({ error: "not logged in" });
         }
     })
@@ -94,12 +92,14 @@ module.exports = function(app, passport) {
         if (req.url == "/webapp/bootstrap/bootstrap.min.css.map") {
             return next();
         }
-        if (req.url == "/isAuthenicated") {
+        if (req.url == "/isAuthenticated") {
             return next();
         }
         if (! req.isAuthenticated()) {
             return res.status(405);
         }
+
+        console.log(req.url);
         return next();
     })
 
@@ -108,7 +108,6 @@ module.exports = function(app, passport) {
             res.status(405);
             return;
         }
-
         return next();
     })
 
@@ -495,24 +494,67 @@ module.exports = function(app, passport) {
      ***************************************/
     // GET all nights of a host
     app.get('/nights/:hostId', function(req, res) {
-        var controller = controllers["user"]
         var hostId = req.params.hostId;
 
-        controller.find({ hostId: hostId }, function(err, results) {
+        if (hostId == "user")
+            hostId = req.user._id.toString();
 
+        var controller = controllers["night"]
+
+        controller.findByDate({ hostId: hostId }, function(err, nights) {
             if (err) {
-                res.json({
+                logger.info({
                     success: false,
-                    message: err
+                    message: "Couldn't find any nights for the user"
                 })
-                logger.info(err)
                 return
             }
-   
-            res.json({
-                success: true,
-                data: results
-            })
+
+            var i = 0;
+            
+            var toReturn = new Array();
+            controller = controllers["game"]
+            for (let night of nights) {
+                let nbParticipants = Array();
+                var validated = false;
+                let validateds = Array();
+
+                let ids = new Array();
+                for (let game of night.games) {
+                    nbParticipants.push(game.nbParticipants);
+                    validateds.push(game.isValidated);
+                    if (game.isValidated) {
+                        validated = true;
+                    }
+                    ids.push(mongoose.Types.ObjectId(game.id));
+                }
+
+                controller.find({
+                    '_id' : {$in : ids}
+                }, function(err, games) {
+                    toReturn.push({
+                        'id' : night['_id'],
+                        'hostId' : night['hostId'],
+                        'name' : night['name'],
+                        'date' : night['date'],
+                        'startTime' : night['startTime'],
+                        'endTime' : night['endTime'],
+                        'description' : night['description'],
+                        'status' : night['status'],
+                        'games' : games,
+                        'nbParticipants' : nbParticipants,
+                        'validated' : validated,
+                        'validateds' : validateds
+                    });
+                    i++;
+                    if (i == nights.length) {
+                        res.json({
+                            data: toReturn,
+                            success: true
+                        })
+                    }
+                })
+            }
         })
     });
 
@@ -772,13 +814,12 @@ module.exports = function(app, passport) {
     });
 
     // GET : upcomming nights
-    app.get('/nights/upCommingNights', function(req, res) {
+    app.get('/upCommingNights', function(req, res) {
         var dateNow = Date.now();
         var controller = controllers["night"];
 
         controller.find({
             date : {$gt: dateNow},
-            "games.participants": {$elemMatch: {id: req.user._id.toString()}},
             "games.isValidated": true
         }, function(err, nights) {
             if (err) {
@@ -790,12 +831,13 @@ module.exports = function(app, passport) {
                 return
             }
 
+            var i = 0;
             var toReturn = new Array();
             controller = controllers['game'];
             for (var night of nights) {
                 for (var game of night.games) {
                     if (game.isValidated) {
-                        controller.findById(mongoose.Types.ObjectId(game.id), function(err, fullGame) {
+                        controller.findById(game.id, function(err, fullGame) {
                             toReturn.push({
                                 'id' : night['_id'],
                                 'hostId' : night['hostId'],
@@ -808,6 +850,8 @@ module.exports = function(app, passport) {
                                 'game' : fullGame,
                                 'nbParticipants' : game.nbParticipants
                             });
+
+                            console.log(toReturn);
 
                             i++;
                             if (i == nights.length) {
@@ -846,7 +890,7 @@ module.exports = function(app, passport) {
     });
 
     // POST Confirm game & night
-    app.post('night/:idNight/confirm/:idGame', function(req, res) {
+    app.post('/night/:idNight/confirm/:idGame', function(req, res) {
         var controllerNight = controllers["night"];
         var controllerGame = controllers["game"];
         var controllerUser = controllers["user"];
@@ -900,7 +944,7 @@ module.exports = function(app, passport) {
                             night.guests.forEach(function(user, i) {
                                 if (user.isValidated === true) {
                                     controllerUser.findById(user.id, function(err, userDB) {
-                                        var message = sendConfirmationEmails(userDB, night, game);
+                                        sendConfirmationEmails(userDB, night, game);
                                     });
                                 }
                             });
@@ -909,17 +953,20 @@ module.exports = function(app, passport) {
                                 success: true,
                                 message: "Soirée mise à jour"
                             });
+                            return
                         });
                     } else {
                         res.json({
                             message: "Il n'y a pas assez de joueur."
                         });
+                        return
                     }
                 });
             } else {
                 res.json({
                     message: "Ce jeu n'existe pas dans cette soirée."
                 });
+                return
             } 
         });
     });

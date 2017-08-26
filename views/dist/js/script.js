@@ -15,11 +15,7 @@ $(document).ready(function() {
             Init.navUser();
         }, error: function(jqXHR, status, err) {
             $("#divConnexion").show();
-        }
-    }).done(function (){
-        if (connected) {
-            functionsAfterConnection();
-        } else {
+
             var id = getQueryStringValue("id");         
             if (id !== null && id !== "") {
                 console.log(id);
@@ -30,13 +26,17 @@ $(document).ready(function() {
                     type: "get",
                     success: function(data, status, jqXHR) {
                         console.log(data);
-                        $('#formInscription [name="lastname"]').val("POULET");
+                        $('#formInscription [name="email"]').val(data.result.email);
                     },
                     error: function(jqXHR, status, err) {
                         console.log(err);
                     }
                 });
             }
+        }
+    }).done(function (){
+        if (connected) {
+            functionsAfterConnection();
         }
     });
 

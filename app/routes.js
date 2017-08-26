@@ -27,12 +27,85 @@ module.exports = function(app, passport) {
     });
 
     app.get('/isAuthenticated', function(req, res) {
+        logger.info("dedans?");
         if (req.isAuthenticated()) {
-            logger.info("oui");
+            logger.info("ici?");
             res.status(200).send({ success: "logged in" });
         } else {
+            logger.info("Ou la?");
             res.status(400).send({ error: "not logged in" });
         }
+    })
+
+    /***************************************************
+     * All the routes linked to the Login and signup ***
+     **************************************************/
+
+    app.post('/login', function(req, res, next) {
+        passport.authenticate('local-login', function(err, user, info) {
+            if (err) {
+                return next(err);
+            }
+            
+            // if user is false, send error
+            if (! user) {
+                return res.send({ success : false, message : info });
+            }
+            req.login(user, loginErr => {
+                if (loginErr) {
+                    return next(loginErr);
+                }
+                return res.send({ success : true, message : info });
+            });      
+        })(req, res, next);
+    });
+
+    // process the signup form
+    app.post('/signup', function(req, res, next) {
+        var data = Array();
+        data.push({ value : req.body.firstname, title : 'votre prénom' });
+        data.push({ value : req.body.lastname, title : 'votre nom' });
+        data.push({ value : req.body.email, title : 'votre adresse mail' });
+        data.push({ value : req.body.password, title : 'votre mot de passe' });
+        var check = checkData(data);
+        if (! check.success) {
+            return res.send(check);
+        }
+
+        if (req.body.password != req.body.passwordConfirmation) {
+            return res.send({ success : false, message : "Les deux mots de passes ne sont pas identiques" });
+        }
+
+        passport.authenticate('local-signup', function(err, user, info) {
+            if (err) {
+                return next(err);
+            }
+            
+            if (! user) {
+                return res.send({ success : false, message : info });
+            }
+
+            return res.send({ success : true, message : info });
+        })(req, res, next);
+    });
+
+    // Check if a user is connected before performing any action
+    app.get('/*', function(req, res, next) {
+        if (! req.isAuthenticated()) {
+            res.status(405);
+            return;
+        }
+
+        return next();
+    })
+
+    app.post('/*', function(req, res, next) {
+        if (! req.isAuthenticated()) {
+            res.status(405);
+            return;
+        }
+
+        return next();
     })
 
     /****************************************
@@ -299,58 +372,6 @@ module.exports = function(app, passport) {
         })
     });
 
-    /***************************************************
-     * All the routes linked to the Login and signup ***
-     **************************************************/
-
-    app.post('/login', function(req, res, next) {
-        passport.authenticate('local-login', function(err, user, info) {
-            if (err) {
-                return next(err);
-            }
-            
-            // if user is false, send error
-            if (! user) {
-                return res.send({ success : false, message : info });
-            }
-            req.login(user, loginErr => {
-                if (loginErr) {
-                    return next(loginErr);
-                }
-                return res.send({ success : true, message : info });
-            });      
-        })(req, res, next);
-    });
-
-    // process the signup form
-    app.post('/signup', function(req, res, next) {
-        var data = Array();
-        data.push({ value : req.body.firstname, title : 'votre prénom' });
-        data.push({ value : req.body.lastname, title : 'votre nom' });
-        data.push({ value : req.body.email, title : 'votre adresse mail' });
-        data.push({ value : req.body.password, title : 'votre mot de passe' });
-        var check = checkData(data);
-        if (! check.success) {
-            return res.send(check);
-        }
-
-        if (req.body.password != req.body.passwordConfirmation) {
-            return res.send({ success : false, message : "Les deux mots de passes ne sont pas identiques" });
-        }
-
-        passport.authenticate('local-signup', function(err, user, info) {
-            if (err) {
-                return next(err);
-            }
-            
-            if (! user) {
-                return res.send({ success : false, message : info });
-            }
-
-            return res.send({ success : true, message : info });
-        })(req, res, next);
-    });
-
     /****************************************
      * All the routes linked to the Emails **
      ***************************************/
@@ -458,7 +479,6 @@ module.exports = function(app, passport) {
                 return
             }
 
-
             var games = result.games;
             var gamesToReturn = [];
             games.forEach(function (game, index) {
@@ -472,7 +492,6 @@ module.exports = function(app, passport) {
                             logger.info(err)
                             return
                         }
-    
                         gamesToReturn.push(result);
 
                         itemsCount++;
@@ -492,11 +511,7 @@ module.exports = function(app, passport) {
                         success: true
                     });
                 }
-                
             });
-            
-            
-            
         })
     });
 
@@ -719,6 +734,7 @@ module.exports = function(app, passport) {
                 }, function(err, games) {
                     toReturn.push({
                         'hostId' : night['hostId'],
+                        'name' : night['name'],
                         'date' : night['date'],
                         'startTime' : night['startTime'],
                         'endTime' : night['endTime'],

@@ -764,15 +764,7 @@ var Init = (function() {
                 
             } else {
                 $(element).click(function() {
-                    var idDiv = "div" + element.id.substring(7);
-                    Utils.toggleDiv(idDiv);
-                    Utils.activeNavItem($(element).parent().attr('id'));
-
-                    if (element.id === "displayManagement") {
-                        CheckInputForm.clearFormCreation();
-                    } else if (element.id === "displayGames") {
-                        CheckInputForm.clearAddGameForm();
-                    } if ($(element).attr('id') !== undefined) {
+                    if ($(element).attr('id') !== undefined) {
                         var idDiv = "div" + element.id.substring(7);
                         Utils.toggleDiv(idDiv);
                         Utils.activeNavItem($(element).parent().closest('li[id]').attr('id'));

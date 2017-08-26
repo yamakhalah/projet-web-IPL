@@ -163,9 +163,27 @@ module.exports = function(app, passport) {
     });
 
     //POST : update user
-    app.post('user/update/:id', function (req, res) {
+    app.post('/user/update/:id', function (req, res) {
+        var data = Array();
+        data.push({ value : req.body.firstname, title : 'votre prénom' });
+        data.push({ value : req.body.lastname, title : 'votre nom' });
+        data.push({ value : req.body.email, title : 'votre adresse mail' });
+        data.push({ value : req.body.password, title : 'votre mot de passe' });
+        var check = checkData(data);
+        if (! check.success) {
+            return res.send(check);
+        }
+
+        if (req.body.password != req.body.passwordConfirmation) {
+            return res.send({ success : false, message : "Les deux mots de passes ne sont pas identiques" });
+        }
+
         var controller = controllers["user"];
         var id = req.params.id;
+
+        console.log(req.body);
+
+        req.body.generateHash(password);
 
         controller.update(id, req.body, function(err, result) {
             if (err) {
@@ -177,10 +195,26 @@ module.exports = function(app, passport) {
                 return
             }
 
-            res.json({
-                success: true,
-                data: result
-            })
+            
+            res.send({ success : true, message : "Utilisateur correctement enregistré." });
+        });
+    });
+
+    app.delete('/user/delete/:id', function (req, res) {
+        var controller = controllers["user"];
+        var id = req.params.id;
+
+        controller.delete(id, function(err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            res.json({ success : true});
         });
     });
 
@@ -401,7 +435,7 @@ module.exports = function(app, passport) {
             to: user.email,
             subject: 'Invitation à une soirée jeux via night-game',
             text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous inscrire via ce lien: '
-                + constants.SERVER_ADDRESS + '/id=' + user.id + ' \n\nA bientôt sur night-game.' 
+                + constants.SERVER_ADDRESS + '/?id=' + user.id + ' \n\nA bientôt sur night-game.' 
         };
         console.log("2");
         
@@ -1058,7 +1092,8 @@ module.exports = function(app, passport) {
 
             req.body.guests.forEach(function(user, index) {
                 controller.findById(user.id, function(err, result) {
-                    if (result.hasOwnProperty('password')) {
+                    console.log(typeof result.password !== "undefined");
+                    if (typeof result.password !== "undefined" && result.password !== "") {
                         sendEmailsToRegisteredUser(result);
                     } else {
                         sendEmailsToUnregisteredUser(result);

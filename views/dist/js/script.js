@@ -17,7 +17,7 @@ $(document).ready(function() {
             $("#divConnexion").show();
 
             var id = getQueryStringValue("id");         
-            if (id !== null && id !== "") {
+            if (typeof id !== "undefined" && id !== "") {
                 console.log(id);
                 Utils.toggleDiv('divInscription');
 
@@ -616,23 +616,37 @@ var User = (function() {
     	if (! $('#formInscription').valid()) {
     		return;
     	} else {
-    		$.ajax({
-	            url: "/signup",
-	            type: "post",
-	            data: formToJson("formInscription"),
-	            success: function(data, status, jqXHR) {
-                    if (! data.success) {
-                        Utils.notifyError(data.message);
-                    } else {
-    	                Utils.notifySucces(data.message);
-    	                setTimeout(function() {
-    	                    location.reload();
-    	                }, 1000);
+            var id = getQueryStringValue("id");         
+            if (typeof id !== "undefined" && id !== "") {
+                $.ajax({
+                    url: "/user/update/" + id,
+                    type: "post",
+                    data: formToJson("formInscription"),
+                    success: function(data, status, jqXHR) {
+                        location.href("/");
+                    }, error: function(jqXHR, status, err) {
+                        Utils.notifyError("Une erreur s'est produite: " + err);
                     }
-	            }, error: function(jqXHR, status, err) {
-	                Utils.notifyError("Une erreur s'est produite: " + err);
-	            }
-	        })
+                });
+            } else {
+                $.ajax({
+                    url: "/signup",
+                    type: "post",
+                    data: formToJson("formInscription"),
+                    success: function(data, status, jqXHR) {
+                        if (! data.success) {
+                            Utils.notifyError(data.message);
+                        } else {
+                            Utils.notifySucces(data.message);
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        }
+                    }, error: function(jqXHR, status, err) {
+                        Utils.notifyError("Une erreur s'est produite: " + err);
+                    }
+                });
+            }
     	} 
     }
     return {

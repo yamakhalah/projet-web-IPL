@@ -508,24 +508,70 @@ module.exports = function(app, passport) {
      ***************************************/
     // GET all nights of a host
     app.get('/nights/:hostId', function(req, res) {
-        var controller = controllers["user"]
         var hostId = req.params.hostId;
 
-        controller.find({ hostId: hostId }, function(err, results) {
+        if (hostId == "user")
+            hostId = req.user._id.toString();
 
+        var controller = controllers["night"]
+
+        controller.findByDate({ hostId: hostId }, function(err, nights) {
             if (err) {
-                res.json({
+                logger.info({
                     success: false,
-                    message: err
+                    message: "Couldn't find any nights for the user"
                 })
-                logger.info(err)
                 return
             }
-   
-            res.json({
-                success: true,
-                data: results
-            })
+
+            var i = 0;
+            
+            var toReturn = new Array();
+            controller = controllers["game"]
+            for (let night of nights) {
+                let nbParticipants = Array();
+                var validated = false;
+                let validateds = Array();
+
+                let ids = new Array();
+                for (let game of night.games) {
+                    nbParticipants.push(game.nbParticipants);
+                    validateds.push(game.isValidated);
+                    if (game.isValidated) {
+                        validated = true;
+                    }
+                    ids.push(mongoose.Types.ObjectId(game.id));
+                }
+
+                controller.find({
+                    '_id' : {$in : ids}
+                }, function(err, games) {
+                    console.log(validated);
+                    toReturn.push({
+                        'id' : night['_id'],
+                        'hostId' : night['hostId'],
+                        'name' : night['name'],
+                        'date' : night['date'],
+                        'startTime' : night['startTime'],
+                        'endTime' : night['endTime'],
+                        'description' : night['description'],
+                        'status' : night['status'],
+                        'games' : games,
+                        'nbParticipants' : nbParticipants,
+                        'validated' : validated,
+                        'validateds' : validateds
+                    });
+                    console.log(toReturn);
+
+                    i++;
+                    if (i == nights.length) {
+                        res.json({
+                            data: toReturn,
+                            success: true
+                        })
+                    }
+                })
+            }
         })
     });
 
@@ -859,7 +905,7 @@ module.exports = function(app, passport) {
     });
 
     // POST Confirm game & night
-    app.post('night/:idNight/confirm/:idGame', function(req, res) {
+    app.post('/night/:idNight/confirm/:idGame', function(req, res) {
         var controllerNight = controllers["night"];
         var controllerGame = controllers["game"];
         var controllerUser = controllers["user"];

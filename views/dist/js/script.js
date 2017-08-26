@@ -188,6 +188,24 @@ $(document).ready(function() {
     $('#navJeux').click(function() {
         $('#section-jeux').attr('style', 'display:block');
     })
+
+    $("#nights-panels").on('click', '.validate', function() {
+        var panel = $(this).closest('.panel');
+        var tr = $(this).closest('tr');
+
+        $.ajax({
+            url: "night/" + $(panel).attr('id') + "/confirm/" + $(tr).attr('id'),
+            type: "post",
+            success: function(data, status, jqXHR) {
+                Utils.notifySucces("La soirée a bien été validée");
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            }, error() {
+
+            }
+        });
+    })
 });
 
 // Add here the methods and events that should happen after the user is connected
@@ -205,7 +223,6 @@ var functionsAfterConnection = function() {
                 Utils.notifyError(data.message);
             } else {
                 var nights = data.data;
-                console.log(nights);
                 var i = 0;
                 for (var night of nights) {
                     var clone = $("#toClone").clone();
@@ -244,6 +261,68 @@ var functionsAfterConnection = function() {
                 }
                 while (i >= 0) {
                     $("#invite-table-" + i).DataTable();
+                    i--;
+                }
+            }
+        }, error: function(jqXHR, status, err) {
+            Utils.notifyError(status);
+        }
+    });
+
+    $.ajax({
+        url: "/nights/user",
+        type: "get",
+        success: function(data, status, jqXHR) {
+            if (! data.success) {
+                Utils.notifyError(data.message);
+            } else {
+                var nights = data.data;
+                console.log(nights);
+                var i = 0;
+                for (var night of nights) {
+                    var clone = $("#toClone").clone();
+
+                    $(clone).removeAttr('id');
+
+                    var date = moment(night.date);
+                    var startTime = moment(night.startTime);
+                    var endTime = moment(night.endTime);
+
+                    var toAdd = date.format("DD / MM / YYYY") + " : " + night.name + " de " + startTime.format("HH:mm") + " à " + endTime.format("HH:mm");
+                    $(clone).find('.panel-heading').html("").append(toAdd);
+
+                    $(clone).find('.panel').first().attr('id', night.id);
+
+                    var j = 0;
+
+                    $(clone).find('.panel-body tbody').first().html("");
+
+                    for (var game of night.games) {
+                        toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
+                            + "<td>" + game.minPlayers + "</td>"
+                            + "<td>" + game.maxPlayers + "</td>"
+                            + "<td>" + night.nbParticipants[j] + "</td>";
+                        if (! game.validated) {
+                            toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> Valider</button></td>"
+                        } else {
+                            if (game.validateds[j]) {
+                                toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success cancel'><i class='fa fa-check'></i> Annuler</button></td>"
+                            }
+                        }
+                        + "</tr>"
+                        $(clone).find('.panel-body tbody').first().append(toAdd);
+                        j++;
+                    }
+                    
+                    $(clone).find('.panel-body table').first().attr('id', "night-table-" + i);
+                    
+                    i++;
+
+                    $(clone).removeAttr('hidden');
+                    $("#nights-panels").append(clone);
+                }
+                while (i >= 0) {
+                    $("#night-table-" + i).DataTable();
                     i--;
                 }
             }

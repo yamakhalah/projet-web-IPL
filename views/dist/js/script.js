@@ -114,7 +114,15 @@ $(document).ready(function() {
 
                             // 2 - Create Night
                             var night = formToJson('formCreation');
-                            console.log(night);
+                            
+                            var night = formToJson('formCreation');
+                            var regex = new RegExp('^[0-9]{4}\-[0-9]{2}\-[0-9]{2}$');
+                            if (regex.test(night['date'])){
+                                var date = moment(night['date'], 'YYYY-MM-DD');
+                            } else {
+                                var date = moment(night['date'], 'DD/MM/YYYY');
+                            }
+
                             var date = moment(night['date'], 'DD/MM/YYYY');
                             night['date'] = new Date(date.valueOf());
                             night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
@@ -141,7 +149,6 @@ $(document).ready(function() {
                             
                             night['games'] = games;
                             night['guests'] = guests;
-                            console.log(night);
 
                             $.ajax({
                                 url: "/night",
@@ -162,13 +169,16 @@ $(document).ready(function() {
                         }
                     });
                 } else {
-                    console.log("3");
                     var guests = new Array();
                     
                     // 2 - Create Night
                     var night = formToJson('formCreation');
-                    console.log(night);
-                    var date = moment(night['date'], 'DD/MM/YYYY');
+                    var regex = new RegExp('^[0-9]{4}\-[0-9]{2}\-[0-9]{2}$');
+                    if (regex.test(night['date'])){
+                        var date = moment(night['date'], 'YYYY-MM-DD');
+                    } else {
+                        var date = moment(night['date'], 'DD/MM/YYYY');
+                    }
                     night['date'] = new Date(date.valueOf());
                     night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
                     night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0000 2017");
@@ -231,8 +241,6 @@ $(document).ready(function() {
     $(document).on('click', '.butDeleteRowEmail', function() {
         $(this).closest('.pInvitationEmail').remove();
     })
-
-
 
     $('#navJeux').click(function() {
         $('#section-jeux').attr('style', 'display:block');

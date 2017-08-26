@@ -11,6 +11,16 @@ module.exports = {
         })
     },
 
+    findByDate: function(params, callback) {
+        Night.find(params).sort({date: -1}).exec(function(err, nights) {
+            if (err) {
+                callback(err, null)
+                return 
+            }
+            callback(null, nights)
+        })
+    },
+
     findById: function(id, callback) {
         Night.findById(id, function(err, night) {
             if (err) {

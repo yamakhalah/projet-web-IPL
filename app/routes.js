@@ -859,6 +859,7 @@ module.exports = function(app, passport) {
 
         var controller = controllers["night"];
 
+        req.body['hostId'] = req.user._id.toString();
         controller.create(req.body, function(err, result) {
             if (err) {
                 res.json({
@@ -881,7 +882,7 @@ module.exports = function(app, passport) {
 
             var controller = controllers["user"]
 
-            controller.update(req.user._id, req.user, function(err, user) {
+            controller.update(req.user._id.toString(), req.user, function(err, user) {
                 if (err) {
                     res.json({
                         success: false,
@@ -911,9 +912,13 @@ module.exports = function(app, passport) {
 
     // Fetch the nights to which the connected user was invited
     app.get('/user-nights', function(req, res) {
+        logger.info(req.user._id.toString());
+
         var controller = controllers["night"]
 
-        controller.find(req.user._id.toString(), function(err, nights) {
+        controller.findByDate(req.user._id.toString(), function(err, nights) {
+            console.log(nights);
+            console.log();
             if (err) {
                 res.json({
                     success: false,
@@ -928,38 +933,41 @@ module.exports = function(app, passport) {
             var toReturn = new Array();
             controller = controllers["game"]
             for (let night of nights) {
-                let nbParticipants = Array();
+                if (req.user._id.toString() != night.hostId) {
 
-                let ids = new Array();
-                for (let game of night.games) {
-                    nbParticipants.push(game.nbParticipants);
-                    ids.push(mongoose.Types.ObjectId(game.id));
-                }
+                    let nbParticipants = Array();
 
-                controller.find({
-                    '_id' : {$in : ids}
-                }, function(err, games) {
-                    toReturn.push({
-                        'id' : night['_id'],
-                        'hostId' : night['hostId'],
-                        'name' : night['name'],
-                        'date' : night['date'],
-                        'startTime' : night['startTime'],
-                        'endTime' : night['endTime'],
-                        'description' : night['description'],
-                        'status' : night['status'],
-                        'games' : games,
-                        'nbParticipants' : nbParticipants
-                    })
-
-                    i++;
-                    if (i == nights.length-1) {
-                        res.json({
-                            data: toReturn,
-                            success: true
-                        })
+                    let ids = new Array();
+                    for (let game of night.games) {
+                        nbParticipants.push(game.nbParticipants);
+                        ids.push(mongoose.Types.ObjectId(game.id));
                     }
-                })
+
+                    controller.find({
+                        '_id' : {$in : ids}
+                    }, function(err, games) {
+                        toReturn.push({
+                            'id' : night['_id'],
+                            'hostId' : night['hostId'],
+                            'name' : night['name'],
+                            'date' : night['date'],
+                            'startTime' : night['startTime'],
+                            'endTime' : night['endTime'],
+                            'description' : night['description'],
+                            'status' : night['status'],
+                            'games' : games,
+                            'nbParticipants' : nbParticipants
+                        })
+
+                        i++;
+                        if (i == nights.length-1) {
+                            res.json({
+                                data: toReturn,
+                                success: true
+                            })
+                        }
+                    })
+                }
             }
         })
     });

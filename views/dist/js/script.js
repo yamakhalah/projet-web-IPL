@@ -81,7 +81,7 @@ $(document).ready(function() {
 
                 // 1 - Send ajax email non-user
 
-                var tabEmail = [];
+                var tabEmail = Array();
                 var testEmail = /^[A-Z0-9._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}$/i;
                 $('.inputInvitationEmail').each(function() {
                     if (testEmail.test($(this).val())) {
@@ -89,74 +89,76 @@ $(document).ready(function() {
                     }
                 });
 
-                // Contains non-user + user
-                var guests = new Array();
+                
 
                 if (tabEmail.length != 0) {
                     $.ajax({
                         url: "/users/addUsersByMail",
                         type: "post",
-                        data: JSON.stringify(tabEmail),
+                        data: {tabEmails : tabEmail},
                         success: function(data, status, jqXHR) {
+                            // Contains non-user + user
+                            var guests = new Array();
+
                             Utils.notifySucces('Email envoyé');
-                            console.log(data);
-                            for (var i = 0; i < data.length; i++) {
+
+                            for (var i = 0; i < data.userIds.length; i++) {
                                 var guest = {
-                                    id : tr.attr('id'),
+                                    id : data.userIds[i],
                                     isValidated : false
                                 }
                                 guests.push(guest);
                             }
+
+                            // 2 - Create Night
+                            var night = formToJson('formCreation');
+                            console.log(night);
+                            var date = moment(night['date'], 'DD/MM/YYYY');
+                            night['date'] = new Date(date.valueOf());
+                            night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
+                            night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0000 2017");
+
+                            // Fetch the games chosen for the night
+                            var games = new Array();
+                            for (var i=0; i < inputTabGames.length; i++) {
+                                var game = {
+                                    id : $(inputTabGames[i]).attr('id'),
+                                    nbParticipants : 0
+                                }
+                                games.push(game);
+                            }
+                            
+                            // Fetch the guests to invite
+                            for (var j=0; j < inputCheckTabGuests.length; j++) {
+                                var guest = {
+                                    id : $(inputCheckTabGuests[j]).attr('id'),
+                                    isValidated : false
+                                }
+                                guests.push(guest);
+                            }
+                            
+                            night['games'] = games;
+                            night['guests'] = guests;
+                            
+                            $.ajax({
+                                url: "/night",
+                                type: "post",
+                                data: night,
+                                success: function(data, status, jqXHR) {
+                                    if (! data.success) {
+                                        Utils.notifyError(data.message);
+                                    } else {
+                                        Utils.notifySucces("La soirée a bien été créée");
+                                    }
+                                }, error: function(jqXHR, status, err) {
+                                    Utils.notifyError(status);
+                                }
+                            }); 
                         }, error: function(jqXHR, status, err) {
                             Utils.notifyError('Problème envoie email user non inscrit');
                         }
                     });
-                }
-
-                // 2 - Create Night
-                var night = formToJson('formCreation');
-                console.log(night);
-                var date = moment(night['date'], 'DD/MM/YYYY');
-                night['date'] = new Date(date.valueOf());
-                night['startTime'] = new Date("Wed Jun 20 " + night['startTime'] + ":00 +0000 2017");
-                night['endTime'] = new Date("Wed Jun 20 " + night['endTime'] + ":00 +0000 2017");
-
-                // Fetch the games chosen for the night
-                var games = new Array();
-                for (var i=0; i < inputTabGames.length; i++) {
-                    var game = {
-                        id : $(inputTabGames[i]).attr('id'),
-                        nbParticipants : 0
-                    }
-                    games.push(game);
-                }
-                
-                // Fetch the guests to invite
-                for (var j=0; j < inputCheckTabGuests.length; j++) {
-                    var guest = {
-                        id : $(inputCheckTabGuests[j]).attr('id'),
-                        isValidated : false
-                    }
-                    guests.push(guest);
-                }
-                
-                night['games'] = games;
-                night['guests'] = guests;
-                
-                $.ajax({
-                    url: "/night",
-                    type: "post",
-                    data: night,
-                    success: function(data, status, jqXHR) {
-                        if (! data.success) {
-                            Utils.notifyError(data.message);
-                        } else {
-                            Utils.notifySucces("La soirée a bien été créée");
-                        }
-                    }, error: function(jqXHR, status, err) {
-                        Utils.notifyError(status);
-                    }
-                });                
+                }              
                 break;
         }
 

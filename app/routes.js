@@ -111,8 +111,11 @@ module.exports = function(app, passport) {
         var emailsArray = Array();
         var itemsCount = 0;
 
-        req.body.forEach(function(emailUser, index) {
-            controller.find({ email: emailUser }, function(err, resultFind) {
+        console.log(req.body.tabEmails);
+
+        req.body.tabEmails.forEach(function(emailUser, index) {
+            console.log(emailUser);
+            controller.find({ email: emailUser.toString() }, function(err, resultFind) {
                 if (err) {
                     res.json({
                         success: false,
@@ -140,7 +143,7 @@ module.exports = function(app, passport) {
                         emailsArray.push({ id: result._id, email: result.email });
 
                         itemsCount++;
-                        if (itemsCount === req.body.length) { 
+                        if (itemsCount === req.body.tabEmails.length) { 
                             res.json({
                                 userIds: usersArray,
                                 userEmails: emailsArray
@@ -152,7 +155,7 @@ module.exports = function(app, passport) {
                     itemsCount++;
                 }
 
-                if (itemsCount === req.body.length) {                  
+                if (itemsCount === req.body.tabEmails.length) {                  
                     res.json({
                         userIds: usersArray,
                         userEmails: emailsArray
@@ -352,50 +355,141 @@ module.exports = function(app, passport) {
     });
 
     /****************************************
-     * All the routes linked to the Emails **
+     * All the routes and method linked to the Emails **
      ***************************************/
-    // POST send all the emails of unregistered users
-    app.post('/emails/sendEmailsToUnregisteredUser', function(req, res) {
-        req.body.users.forEach(function(user, index) {
-            var transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: 'night.game.ipl@gmail.com',
-                    pass: 'n1ght.g4m3_1PL'
+    // Methods to send emails to unregistered users
+    var sendEmailsToUnregisteredUser = function(user) {
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'night.game.ipl@gmail.com',
+                pass: 'n1ght.g4m3_1PL'
+            }
+        });
+
+        var mailOptions = {
+            from: 'night.game.ipl@gmail.com',
+            to: user.email,
+            subject: 'Invitation à une soirée jeux via night-game',
+            text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous inscrire via ce lien: '
+                + constants.SERVER_ADDRESS + '/registration/' + user.id + ' \n\nA bientôt sur night-game.' 
+        };
+        
+        transporter.sendMail(mailOptions, function(err, info){
+            if (err) {
+                res.json({
+                    success: false,
+                    message: "Couldn't send email to " + user.email
+                })
+                logger.info(err)
+                return
+            } else {
+              res.json({
+                  success: true,
+                  message: "Email correctly send."
+              })
+            }
+        }); 
+    };
+
+    var sendEmailsToRegisteredUser = function(user) {
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'night.game.ipl@gmail.com',
+                pass: 'n1ght.g4m3_1PL'
+            }
+        });
+
+        var mailOptions = {
+            from: 'night.game.ipl@gmail.com',
+            to: user.email,
+            subject: 'Invitation à une soirée jeux via night-game',
+            text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous connecter au site pour accèder à l\'invitation'
+                + '\n\nA bientôt sur night-game.' 
+        };
+        
+        transporter.sendMail(mailOptions, function(err, info){
+            if (err) {
+                res.json({
+                    success: false,
+                    message: "Couldn't send email to " + user.email
+                })
+                logger.info(err)
+                return
+            } else {
+              res.json({
+                  success: true,
+                  message: "Email correctly send."
+              })
+            }
+        }); 
+    };
+
+    var sendConfirmationEmails = function(user, night) {
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'night.game.ipl@gmail.com',
+                pass: 'n1ght.g4m3_1PL'
+            }
+        });
+
+        var mailOptions = {
+            from: 'night.game.ipl@gmail.com',
+            to: user.email,
+            subject: 'Confirmation à une soirée jeux via night-game',
+            text: 'La soirée du ' + night.date.toISOString().substring(0, 10) + ' a été confirmé !\nVeuillez vous connecter au site pour accèder à la soirée en question.'
+                + '\n\nA bientôt sur night-game.' 
+        };
+        
+        transporter.sendMail(mailOptions, function(err, info){
+            if (err) {
+                res.json({
+                    success: false,
+                    message: "Couldn't send email to " + user.email
+                })
+                logger.info(err)
+                return
+            } else {
+              res.json({
+                  success: true,
+                  message: "Email correctly send."
+              })
+            }
+        }); 
+    }
+
+    // POST send all the confirmation emails of a night
+    app.post('/emails/sendConfirmationEmails/:idNight', function(req, res) {
+        var controllerNight = controllers["night"];
+        var controllerUser = controllers["user"];
+        var id = req.params.idNight;
+
+        controllerNight.findById(id, function(err, night) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                })
+                logger.info(err)
+                return
+            }
+
+            night.guests.forEach(function (user, index) {
+                if (user.isValidated) {
+                    controllerUser.findById(user.id, function(err, result) {
+
+                    });
                 }
             });
-    
-            var mailOptions = {
-                from: 'night.game.ipl@gmail.com',
-                to: user.email,
-                subject: 'Invitation à une soirée jeux via night-game',
-                text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous inscrire via ce lien: '
-                    + constants.SERVER_ADDRESS + '/registration/' + user.id + ' \n\nA bientôt sur night-game.' 
-            };
-            
-            transporter.sendMail(mailOptions, function(err, info){
-                if (err) {
-                    res.json({
-                        success: false,
-                        message: "Couldn't send email to " + user.email
-                    })
-                    logger.info(err)
-                    return
-                } else {
-                  res.json({
-                      success: true,
-                      message: "Email correctly send."
-                  })
-                }
-              }); 
         });
-        
     });
 
     /****************************************
      * All the routes linked to the Nights **
      ***************************************/
-    // GET all nights of a host (TO CONTINUE (Gaby))
+    // GET all nights of a host
     app.get('/nights/:hostId', function(req, res) {
         var controller = controllers["user"]
         var hostId = req.params.hostId;
@@ -494,10 +588,48 @@ module.exports = function(app, passport) {
                 }
                 
             });
-            
-            
-            
         })
+    });
+
+    // POST update : validate a user in a night
+    app.post('/night/:idNight/validateUser', function(res, req) {
+        var controller = controllers["night"];
+        var id = req.params.id;
+
+        controller.findById(id, function (err, result) {
+            if (err) {
+                res.json({
+                    success: false,
+                    message: err
+                });
+                logger.info(err);
+                return
+            }
+
+            var index = result.guests.findIndex(function (user) {
+                if (req.user._id === user.id) {
+                    return user;
+                }
+            });
+
+            result.guests[index].isValidated = true;
+
+            controller.update(result._id, result, function(err, result) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        message: err
+                    });
+                    logger.info(err);
+                    return
+                }
+
+                res.json({
+                    success: true,
+                    message: "User added to the game"
+                });
+            });
+        });
     });
 
     // POST update : add a participants to a game
@@ -519,7 +651,7 @@ module.exports = function(app, passport) {
             user.push({ userId : req.user._id });
 
             var index = result.games.findIndex(function (game) {
-                if (game._id == idGame) {
+                if (game.id === idGame) {
                     return game;
                 }
             });
@@ -541,8 +673,8 @@ module.exports = function(app, passport) {
                     success: true,
                     message: "User added to the game"
                 });
-            })
-        })
+            });
+        });
     });
 
     // POST update : delete a participants to a game
@@ -638,6 +770,7 @@ module.exports = function(app, passport) {
     app.post('/night', function(req, res, next) {
         // Check if the data is fully filled
         var data = Array();
+        data.push({ value : req.body.name, title : 'le nom' });
         data.push({ value : req.body.date, title : 'la date' });
         data.push({ value : req.body.startTime, title : 'l\'heure de début' });
         data.push({ value : req.body.endTime, title : 'l\'heure de fin' });
@@ -684,10 +817,20 @@ module.exports = function(app, passport) {
                 res.json({
                     data: result,
                     success: true
+                });
+            });
+
+            req.body.guests.forEach(function(user, index) {
+                controller.findById(user.id, function(err, result) {
+                    if (result.password !== null) {
+                        sendEmailsToRegisteredUser(result);
+                    } else {
+                        sendEmailsToUnregisteredUser(result);
+                    }
                 })
-            })
-        })
-    })
+            });
+        });
+    });
 
     // Fetch the nights to which the connected user was invited
     app.get('/user-nights', function(req, res) {

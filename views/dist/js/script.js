@@ -252,6 +252,7 @@ var functionsAfterConnection = function() {
                 Utils.notifyError(data.message);
             } else {
                 var nights = data.data;
+                console.log(nights);
                 for (var night of nights) {
                     var clone = $("#toClone").clone();
 
@@ -262,17 +263,20 @@ var functionsAfterConnection = function() {
                     var toAdd = date.format("DD / MM / YYYY") + " : " + night.name + " de " + startTime.format("HH:mm") + " à " + endTime.format("HH:mm");
                     $(clone).find('.panel-heading').html("").append(toAdd);
 
-                    var i = 0;
-                    
+                    $(clone).find('.panel').first().attr('id', night.id);
+
+                    var i = 0; var j = 0;
+
                     $(clone).find('.panel-body tbody').first().html("");
                     for (var game of night.games) {
-                        toAdd = "<tr><td>" + game.name + "</td>"
+                        toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
                             + "<td>" + game.minPlayers + "</td>"
                             + "<td>" + game.maxPlayers + "</td>"
-                            + "<td>" + game.nbParticipants + "</td>"
+                            + "<td>" + night.nbParticipants[j] + "</td>"
                             + "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> S'inscrire</button></td>"
                             + "</tr>"
                         $(clone).find('.panel-body tbody').first().append(toAdd);
+                        j++;
                     }
                     
                     $(clone).find('.panel-body').first().attr('id', "invite-table-" + i);
@@ -289,7 +293,30 @@ var functionsAfterConnection = function() {
         }
     }); 
 
+    $("#divInvitations").on('click', '.validate', function() {
+        var panel = $(this).closest('.panel');
+        var idNight = $(panel).attr('id');
 
+        var tr = $(this).closest('tr');
+        var idGame = $(tr).attr('id');
+
+        $.ajax({
+            url: "/night/addParticipant",
+            type: "post",
+            data: {
+                'idNight': idNight,
+                'idGame': idGame
+            },
+            success: function(data, status, jqXHR) {
+                Utils.notifySucces(data.message);
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            }, error: function(jqXHR, status, err) {
+                notifyError(err);
+            }
+        });
+    });
 
     var nightsColumns = [
             {"data": null, "visible": true, "orderable": false},

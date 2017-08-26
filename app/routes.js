@@ -655,10 +655,10 @@ module.exports = function(app, passport) {
     });
 
     // POST update : add a participants to a game
-    app.post('/night/:idNight/addParticipant/:idGame', function(res, req) {
+    app.post('/night/addParticipant', function(req, res) {
         var controller = controllers["night"];
-        var idNight = req.params.idNight;
-        var idGame = req.params.idGame;
+        var idNight = req.body.idNight;
+        var idGame = req.body.idGame;
 
         controller.findById(idNight, function (err, result) {
             if (err) {
@@ -693,7 +693,7 @@ module.exports = function(app, passport) {
 
                 res.json({
                     success: true,
-                    message: "User added to the game"
+                    message: "Vous avez bien été ajouté au jeu, vous pouvez désormais y participer"
                 });
             });
         });
@@ -873,9 +873,11 @@ module.exports = function(app, passport) {
             var toReturn = new Array();
             controller = controllers["game"]
             for (let night of nights) {
+                let nbParticipants = Array();
 
                 let ids = new Array();
                 for (let game of night.games) {
+                    nbParticipants.push(game.nbParticipants);
                     ids.push(mongoose.Types.ObjectId(game.id));
                 }
 
@@ -883,6 +885,7 @@ module.exports = function(app, passport) {
                     '_id' : {$in : ids}
                 }, function(err, games) {
                     toReturn.push({
+                        'id' : night['_id'],
                         'hostId' : night['hostId'],
                         'name' : night['name'],
                         'date' : night['date'],
@@ -890,7 +893,8 @@ module.exports = function(app, passport) {
                         'endTime' : night['endTime'],
                         'description' : night['description'],
                         'status' : night['status'],
-                        'games' : games
+                        'games' : games,
+                        'nbParticipants' : nbParticipants
                     })
 
                     i++;

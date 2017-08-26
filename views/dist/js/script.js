@@ -244,6 +244,53 @@ var functionsAfterConnection = function() {
     gameNightHandler();
 
     // List all the nights to which the connected user has been invited to
+    $.ajax({
+        url: "/user-nights",
+        type: "get",
+        success: function(data, status, jqXHR) {
+            if (! data.success) {
+                Utils.notifyError(data.message);
+            } else {
+                var nights = data.data;
+                for (var night of nights) {
+                    var clone = $("#toClone").clone();
+
+                    var date = moment(night.date);
+                    var startTime = moment(night.startTime);
+                    var endTime = moment(night.endTime);
+
+                    var toAdd = date.format("DD / MM / YYYY") + " : " + night.name + " de " + startTime.format("HH:mm") + " à " + endTime.format("HH:mm");
+                    $(clone).find('.panel-heading').html("").append(toAdd);
+
+                    var i = 0;
+                    
+                    $(clone).find('.panel-body tbody').first().html("");
+                    for (var game of night.games) {
+                        toAdd = "<tr><td>" + game.name + "</td>"
+                            + "<td>" + game.minPlayers + "</td>"
+                            + "<td>" + game.maxPlayers + "</td>"
+                            + "<td>" + game.nbParticipants + "</td>"
+                            + "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> S'inscrire</button></td>"
+                            + "</tr>"
+                        $(clone).find('.panel-body tbody').first().append(toAdd);
+                    }
+                    
+                    $(clone).find('.panel-body').first().attr('id', "invite-table-" + i);
+                    i++;
+
+                    $("#invite-table-" + i).DataTable();
+
+                    $(clone).removeAttr('hidden');
+                    $("#invitations-panels").append(clone);
+                }
+            }
+        }, error: function(jqXHR, status, err) {
+            Utils.notifyError(status);
+        }
+    }); 
+
+
+
     var nightsColumns = [
             {"data": null, "visible": true, "orderable": false},
             {"data": null, "visible": true, "orderable": false},

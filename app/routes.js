@@ -813,13 +813,12 @@ module.exports = function(app, passport) {
     });
 
     // GET : upcomming nights
-    app.get('/nights/upCommingNights', function(req, res) {
+    app.get('/upCommingNights', function(req, res) {
         var dateNow = Date.now();
         var controller = controllers["night"];
 
         controller.find({
             date : {$gt: dateNow},
-            "games.participants": {$elemMatch: {id: req.user._id.toString()}},
             "games.isValidated": true
         }, function(err, nights) {
             if (err) {
@@ -831,14 +830,13 @@ module.exports = function(app, passport) {
                 return
             }
 
-            console.log("ixi?");
-
+            var i = 0;
             var toReturn = new Array();
             controller = controllers['game'];
             for (var night of nights) {
                 for (var game of night.games) {
                     if (game.isValidated) {
-                        controller.findById(mongoose.Types.ObjectId(game.id), function(err, fullGame) {
+                        controller.findById(game.id, function(err, fullGame) {
                             toReturn.push({
                                 'id' : night['_id'],
                                 'hostId' : night['hostId'],
@@ -851,6 +849,8 @@ module.exports = function(app, passport) {
                                 'game' : fullGame,
                                 'nbParticipants' : game.nbParticipants
                             });
+
+                            console.log(toReturn);
 
                             i++;
                             if (i == nights.length) {

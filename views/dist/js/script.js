@@ -505,6 +505,7 @@ var nightsIncomming = function() {
         {"data": null, "visible": true, "searchable": true},
         {"data": null, "visible": true, "searchable": true},
         {"data": "name", "visible": true, "searchable": true},
+        {"data": "game.name", "visible": true, "searchable": true},
         {"data": "nbParticipants", "visible": true, "searchable": true},
         {"data": null, "visible": true, "orderable": false}
 
@@ -534,22 +535,16 @@ var nightsIncomming = function() {
         },
         {
             "render": function (data, type, row) {
-                return ;
-            },
-            "targets": 4
-        },
-        {
-            "render": function (data, type, row) {
                 if (data.status == "CONFIRMED")
                     return "<i class='fa fa-check' style='color: green;'></i>";
                 else
                     return "<i class='fa fa-times' style='color: tomato;'></i>"
             },
-            "targets": 5
+            "targets": 6
         }
     ];
 
-    initDatatable("nights-resume-table", "/nights/upCommingNights", nightsIncommingColumns, nightsIncommingColumnDefs);
+    initDatatable("nights-resume-table", "/upCommingNights", nightsIncommingColumns, nightsIncommingColumnDefs);
 
 }
 

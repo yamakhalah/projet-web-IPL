@@ -17,7 +17,8 @@ var nightSchema = mongoose.Schema({
         nbParticipants : Number,
         participants : [{
             userId : String
-        }]
+        }],
+        isValidated : Boolean
     }]
 });
 

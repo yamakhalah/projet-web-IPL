@@ -422,22 +422,26 @@
 
     <div id="divNights" class="container" style="display: none;z-index: 100;">
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
-                <div class="panel-default panel panel-primary" style="margin-top: 250px">
-                    <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
-                        <h3 class="panel-title"><b>Soirées à venir</b></h3>
-                    </div>
-                    <div class="panel-body">
-                        <div id="nightExemple1">
-                            <label>1) 24/12/17 - Soirée WoW - 19H-05H</label>
-                            <div class="form-group">
-                                <label style="margin-left: 50px">Jeux où vous êtes inscrits: </label>
-                                <select id="jsGames" style="width: 200px; margin-left: 20px">
-                                    <option>A IMPLEMENTER EN JS</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+            <div class="panel panel-primary" style="margin-top: 100px">
+                <div class="panel-heading" style="display: flex; align-items: center; justify-content: center;">
+                    <h3 class="panel-title"><b>Soirées à venir</b></h3>
+                </div>
+                <div class="panel-body">
+                    <table id="nights-resume-table" class="table table-striped responsive" style="min-width:100%; stycellspacing=0;">
+                        <thead>
+                            <tr>
+                                <th>Etat soirée</th>
+                                <th>Date</th>
+                                <th>Horaire</th>
+                                <th>Nom</th>
+                                <th>Jeu</th>
+                                <th>Nbr. Participants</th>
+                                <th>Confirmé</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

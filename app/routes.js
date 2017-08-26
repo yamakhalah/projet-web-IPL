@@ -883,11 +883,9 @@ module.exports = function(app, passport) {
 
     // Fetch the nights to which the connected user was invited
     app.get('/user-nights', function(req, res) {
-        logger.info(req.user._id.toString());
-
         var controller = controllers["night"]
 
-        controller.findByDate(req.user._id.toString(), function(err, nights) {
+        controller.findByDate({"guests": {$elemMatch: {id: req.user._id.toString()}}}, function(err, nights) {
             console.log(nights);
             console.log();
             if (err) {
@@ -904,41 +902,40 @@ module.exports = function(app, passport) {
             var toReturn = new Array();
             controller = controllers["game"]
             for (let night of nights) {
-                if (req.user._id.toString() != night.hostId) {
+                console.log(night);
+                let nbParticipants = Array();
 
-                    let nbParticipants = Array();
-
-                    let ids = new Array();
-                    for (let game of night.games) {
-                        nbParticipants.push(game.nbParticipants);
-                        ids.push(mongoose.Types.ObjectId(game.id));
-                    }
-
-                    controller.find({
-                        '_id' : {$in : ids}
-                    }, function(err, games) {
-                        toReturn.push({
-                            'id' : night['_id'],
-                            'hostId' : night['hostId'],
-                            'name' : night['name'],
-                            'date' : night['date'],
-                            'startTime' : night['startTime'],
-                            'endTime' : night['endTime'],
-                            'description' : night['description'],
-                            'status' : night['status'],
-                            'games' : games,
-                            'nbParticipants' : nbParticipants
-                        })
-
-                        i++;
-                        if (i == nights.length-1) {
-                            res.json({
-                                data: toReturn,
-                                success: true
-                            })
-                        }
-                    })
+                let ids = new Array();
+                for (let game of night.games) {
+                    nbParticipants.push(game.nbParticipants);
+                    ids.push(mongoose.Types.ObjectId(game.id));
                 }
+
+                controller.find({
+                    '_id' : {$in : ids}
+                }, function(err, games) {
+                    toReturn.push({
+                        'id' : night['_id'],
+                        'hostId' : night['hostId'],
+                        'name' : night['name'],
+                        'date' : night['date'],
+                        'startTime' : night['startTime'],
+                        'endTime' : night['endTime'],
+                        'description' : night['description'],
+                        'status' : night['status'],
+                        'games' : games,
+                        'nbParticipants' : nbParticipants
+                    });
+
+                    i++;
+                    console.log(nights.length);
+                    if (i == nights.length) {
+                        res.json({
+                            data: toReturn,
+                            success: true
+                        })
+                    }
+                })
             }
         })
     });

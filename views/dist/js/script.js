@@ -194,6 +194,7 @@ $(document).ready(function() {
 var functionsAfterConnection = function() {
     gamesHandler();
     gameNightHandler();
+    nightsIncomming();
 
     // List all the nights to which the connected user has been invited to
     $.ajax({
@@ -413,10 +414,10 @@ var nightsIncomming = function() {
     */
     var nightsIncommingColumns = [
         {"data": null, "visible": true, "orderable": false},
-        {"data": "date", "visible": true, "searchable": true},
-        {"data": "null", "visible": true, "searchable": true},
-        {"data": "name", "visible": true, "searchable": true},
         {"data": null, "visible": true, "searchable": true},
+        {"data": null, "visible": true, "searchable": true},
+        {"data": "name", "visible": true, "searchable": true},
+        {"data": "nbParticipants", "visible": true, "searchable": true},
         {"data": null, "visible": true, "orderable": false}
 
     ];
@@ -424,27 +425,24 @@ var nightsIncomming = function() {
     var nightsIncommingColumnDefs = [
         {
             "render": function ( data, type, row ) {
-                return ;
+                return data.status;
             },
             "targets": 0
         },
         {
             "render": function ( data, type, row ) {
-                return ;
+                var date = moment(data.date);
+                return date.format("DD / MM / YYYY");
             },
             "targets": 1
         },
         {
             "render": function (data, type, row) {
-                return ;
+                var startTime = moment(data.startTime);
+                var endTime = moment(data.endTime);
+                return startTime.format("HH:mm") + ":" + endTime.format("HH:mm");
             },
             "targets": 2
-        },
-        {
-            "render": function (data, type, row) {
-                return ;
-            },
-            "targets": 3
         },
         {
             "render": function (data, type, row) {
@@ -454,19 +452,16 @@ var nightsIncomming = function() {
         },
         {
             "render": function (data, type, row) {
-                return ;
+                if (data.status == "CONFIRMED")
+                    return "<i class='fa fa-check' style='color: green;'></i>";
+                else
+                    return "<i class='fa fa-times' style='color: tomato;'></i>"
             },
             "targets": 5
-        },
-        {
-            "render": function (data, type, row) {
-                return ;
-            },
-            "targets": 6
         }
     ];
 
-    initDatatable("nights-resume-table", "", nightsIncommingColumns, nightsIncommingColumnDefs);
+    initDatatable("nights-resume-table", "/nights/upCommingNights", nightsIncommingColumns, nightsIncommingColumnDefs);
 
 }
 

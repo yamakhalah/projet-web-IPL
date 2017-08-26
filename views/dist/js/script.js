@@ -4,7 +4,7 @@ var playableGamesTable;
 
 $(document).ready(function() {
     Init.all();
-    Init.navUser();
+    Init.navUser(); 
 
     // Check if the use is authenticated
     $.ajax({
@@ -15,6 +15,24 @@ $(document).ready(function() {
             Init.navUser();
         }, error: function(jqXHR, status, err) {
             $("#divConnexion").show();
+
+            var id = getQueryStringValue("id");         
+            if (id !== null && id !== "") {
+                console.log(id);
+                Utils.toggleDiv('divInscription');
+
+                $.ajax({
+                    url: "/user/" + id,
+                    type: "get",
+                    success: function(data, status, jqXHR) {
+                        console.log(data);
+                        $('#formInscription [name="lastname"]').val("POULET");
+                    },
+                    error: function(jqXHR, status, err) {
+                        console.log(err);
+                    }
+                });
+            }
         }
     }).done(function (){
         if (connected) {
@@ -1071,3 +1089,7 @@ var initDatatable = function(tableId, route, columns, columnDefs) {
         columnDefs: columnDefs
     });
 }
+
+var getQueryStringValue = function (key) {  
+    return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+}  

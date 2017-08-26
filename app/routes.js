@@ -139,6 +139,7 @@ module.exports = function(app, passport) {
 
     // GET one user by ID
     app.get('/user/:id', function(req, res) {
+        console.log("1");
         var id = req.params.id
         var controller = controllers["user"]
 
@@ -391,23 +392,24 @@ module.exports = function(app, passport) {
                 pass: 'n1ght.g4m3_1PL'
             }
         });
+        console.log("1");
 
         var mailOptions = {
             from: 'night.game.ipl@gmail.com',
             to: user.email,
             subject: 'Invitation à une soirée jeux via night-game',
             text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous inscrire via ce lien: '
-                + constants.SERVER_ADDRESS + '/registration/' + user.id + ' \n\nA bientôt sur night-game.' 
+                + constants.SERVER_ADDRESS + '/id=' + user.id + ' \n\nA bientôt sur night-game.' 
         };
+        console.log("2");
         
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
                 logger.info(err)
-                return "Couldn't send email to " + user.email;
-            } else {
-              return "Email correctly send.";
-            }
+                return
+            } 
         }); 
+        console.log("3");
     };
 
     var sendEmailsToRegisteredUser = function(user) {
@@ -418,6 +420,7 @@ module.exports = function(app, passport) {
                 pass: 'n1ght.g4m3_1PL'
             }
         });
+        console.log("4");
 
         var mailOptions = {
             from: 'night.game.ipl@gmail.com',
@@ -426,15 +429,14 @@ module.exports = function(app, passport) {
             text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous connecter au site pour accèder à l\'invitation'
                 + '\n\nA bientôt sur night-game.' 
         };
-        
+        console.log("5");
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
                 logger.info(err)
-                return "Couldn't send email to " + user.email;
-            } else {
-              return "Email correctly send.";
+                return
             }
         }); 
+        console.log("6");
     };
 
     var sendConfirmationEmails = function(user, night, game) {
@@ -456,10 +458,9 @@ module.exports = function(app, passport) {
         
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
-                return "Couldn't send mail."
-            } else {
-                return "Email correctly send.";
-            }
+                logger.info(err)
+                return
+            } 
         }); 
     }
 
@@ -900,10 +901,6 @@ module.exports = function(app, passport) {
                                 if (user.isValidated === true) {
                                     controllerUser.findById(user.id, function(err, userDB) {
                                         var message = sendConfirmationEmails(userDB, night, game);
-                                        res.json({
-                                            success: true,
-                                            message: message
-                                        })
                                     });
                                 }
                             });
@@ -1007,25 +1004,22 @@ module.exports = function(app, passport) {
                     logger.info(err)
                     return
                 }
-
-                res.json({
-                    data: result,
-                    success: true
-                });
             });
 
             req.body.guests.forEach(function(user, index) {
                 controller.findById(user.id, function(err, result) {
-                    var message;
                     if (result.hasOwnProperty('password')) {
-                        message = sendEmailsToRegisteredUser(result);
+                        sendEmailsToRegisteredUser(result);
                     } else {
-                        message =sendEmailsToUnregisteredUser(result);
+                        sendEmailsToUnregisteredUser(result);
                     }
-                    res.json({
-                        message: message
-                    })
+                    
                 })
+            });
+
+            res.json({
+                success: true,
+                message: "Envoie des mails correctement réussi."
             });
         });
     });
@@ -1058,7 +1052,7 @@ module.exports = function(app, passport) {
                     ids.push(mongoose.Types.ObjectId(game.id));
                 }
 
-                if (night.date < dateNow) {
+                if (night.date < dateNow && night.status !== constants.FINISHED_NIGHT) {
                     night.status = constants.FINISHED_NIGHT;
 
                     controller.update(night._id, night, function (err, result) {
@@ -1071,8 +1065,6 @@ module.exports = function(app, passport) {
                             return
                         }
                     });
-
-                    console.log(night);
                 }
 
                 controller.find({

@@ -92,9 +92,7 @@ $(document).ready(function() {
                 // Contains non-user + user
                 var guests = new Array();
 
-                console.log("1");
                 if (tabEmail.length != 0) {
-                    console.log("2");
                     $.ajax({
                         async: false,
                         url: "/users/addUsersByMail",
@@ -102,7 +100,6 @@ $(document).ready(function() {
                         data: {tabEmails : tabEmail},
                         success: function(data, status, jqXHR) {
                             
-
                             Utils.notifySucces('Email envoyé');
 
                             for (var i = 0; i < data.userIds.length; i++) {
@@ -401,6 +398,76 @@ var gameNightHandler = function() {
             }
         ]
     initDatatable("invite-guests-table", "/users", guestTableColumns, guestTableColumnDefs);
+}
+
+// TODO 
+var nightsIncomming = function() {
+    /*
+        0 : Etat soirée
+        1 : Date
+        2: Horaire
+        3 : Nom soiree
+        4 : Nom jeu
+        5 : Nbr participants
+        6 : Confirmer (si le jeu est confirme)
+    */
+    var nightsIncommingColumns = [
+        {"data": null, "visible": true, "orderable": false},
+        {"data": "date", "visible": true, "searchable": true},
+        {"data": "null", "visible": true, "searchable": true},
+        {"data": "name", "visible": true, "searchable": true},
+        {"data": null, "visible": true, "searchable": true},
+        {"data": null, "visible": true, "orderable": false}
+
+    ];
+
+    var nightsIncommingColumnDefs = [
+        {
+            "render": function ( data, type, row ) {
+                return ;
+            },
+            "targets": 0
+        },
+        {
+            "render": function ( data, type, row ) {
+                return ;
+            },
+            "targets": 1
+        },
+        {
+            "render": function (data, type, row) {
+                return ;
+            },
+            "targets": 2
+        },
+        {
+            "render": function (data, type, row) {
+                return ;
+            },
+            "targets": 3
+        },
+        {
+            "render": function (data, type, row) {
+                return ;
+            },
+            "targets": 4
+        },
+        {
+            "render": function (data, type, row) {
+                return ;
+            },
+            "targets": 5
+        },
+        {
+            "render": function (data, type, row) {
+                return ;
+            },
+            "targets": 6
+        }
+    ];
+
+    initDatatable("nights-resume-table", "", nightsIncommingColumns, nightsIncommingColumnDefs);
+
 }
 
 var User = (function() {

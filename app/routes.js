@@ -1054,26 +1054,41 @@ module.exports = function(app, passport) {
                     logger.info(err)
                     return
                 }
-            });
+                // Contiendra tous les adresses mails pour lesquelles on a pas pu envoyer l'invitation
+                var mailErrors = [];
+                // Sert à récupérer la valeur de retour: ok si ça s'est bien passé et l'adresse mail qui a fail sinon
+                var ok = '';
+                req.body.guests.forEach(function(user, index) {
+                    controller.findById(user.id, function(err, result) {
+                        if (result.hasOwnProperty('password')) {
+                            ok = sendEmailsToRegisteredUser(result);
+                            if(ok != 'ok')
+                                mailErrors.push(ok);
+                        } else {
+                            ok = sendEmailsToUnregisteredUser(result);
+                            if(ok != 'ok')
+                                mailErrors.push(ok);
+                        }
+                    })
+                });
 
-            req.body.guests.forEach(function(user, index) {
-                controller.findById(user.id, function(err, result) {
-                    if (result.hasOwnProperty('password')) {
-                        sendEmailsToRegisteredUser(result);
-                    } else {
-                        sendEmailsToUnregisteredUser(result);
+                // S'il y a eu une erreur lors de l'envoie des mails
+                if(mailErrors.length > 0){
+                    var errors = '';
+                    for(let e of mailErrors){
+                        errors += e + ' ';
                     }
-                    
-                })
-            });
-
-            res.json({
-                success: true,
-                message: "Envoie des mails correctement réussi."
-            });
+                    res.json({
+                        message: "nous n'avons pas pu envoyer d'invitations à ces personnes : " + errors
+                    })
+                }
+                res.json({
+                    data: result,
+                    success: true
+                });
+            });            
         });
     });
-
     // Fetch the nights to which the connected user was invited
     app.get('/user-nights', function(req, res) {
         var controller = controllers["night"]

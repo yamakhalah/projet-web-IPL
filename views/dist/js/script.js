@@ -132,6 +132,7 @@ $(document).ready(function() {
                 }
                 
                 // 2 - Create Night
+                
                 var night = formToJson('formCreation');
                 var regex = new RegExp('^[0-9]{4}\-[0-9]{2}\-[0-9]{2}$');
                 if (regex.test(night['date'])){
@@ -149,8 +150,7 @@ $(document).ready(function() {
                 for (var i=0; i < inputTabGames.length; i++) {
                     var game = {
                         id : $(inputTabGames[i]).attr('id'),
-                        nbParticipants : 0,
-                        isValidated : false
+                        nbParticipants : 0
                     }
                     games.push(game);
                 }
@@ -166,7 +166,6 @@ $(document).ready(function() {
                 
                 night['games'] = games;
                 night['guests'] = guests;
-
                 $.ajax({
                     url: "/night",
                     type: "post",
@@ -174,6 +173,9 @@ $(document).ready(function() {
                     success: function(data, status, jqXHR) {
                         if (! data.success) {
                             Utils.notifyError(data.message);
+                        } 
+                        else if(typeof data.message !== 'undefined' && data.message.indexOf("nous n'avons pas pu envoyer d'invitations à ces personnes :") != -1){
+                            Utils.notifySucces("La soirée a bien été créée cependant " + data.message);
                         } else {
                             newPanel = 1;
                             Utils.resetForm($('#formCreation'));
@@ -185,10 +187,9 @@ $(document).ready(function() {
                     }, error: function(jqXHR, status, err) {
                         Utils.notifyError(status);
                     }
-                });       
+                });
                 break;
         }
-
     	if (newPanel !== 0) {
             $('div[class="tab-pane fade active in"]').removeClass("active in");
             $('a[href="#' + idPanel +'"]').parent().removeClass("active");

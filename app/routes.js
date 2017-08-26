@@ -102,7 +102,6 @@ module.exports = function(app, passport) {
             return res.status(405);
         }
 
-        console.log(req.url);
         return next();
     })
 
@@ -141,7 +140,6 @@ module.exports = function(app, passport) {
 
     // GET one user by ID
     app.get('/user/:id', function(req, res) {
-        console.log("1");
         var id = req.params.id
         var controller = controllers["user"]
 
@@ -225,10 +223,7 @@ module.exports = function(app, passport) {
         var emailsArray = Array();
         var itemsCount = 0;
 
-        console.log(req.body.tabEmails);
-
         req.body.tabEmails.forEach(function(emailUser, index) {
-            console.log(emailUser);
             controller.find({ email: emailUser.toString() }, function(err, resultFind) {
                 if (err) {
                     res.json({
@@ -240,7 +235,6 @@ module.exports = function(app, passport) {
                 }
 
                 if (resultFind.length === 0) {
-                    console.log(itemsCount);
                     var user = { email: emailUser }
                     controller.create(user, function(err, result) {
                         
@@ -276,8 +270,6 @@ module.exports = function(app, passport) {
                     });
                 }
             });
-
-            console.log(usersArray);
             
         });
     })
@@ -428,7 +420,6 @@ module.exports = function(app, passport) {
                 pass: 'n1ght.g4m3_1PL'
             }
         });
-        console.log("1");
 
         var mailOptions = {
             from: 'night.game.ipl@gmail.com',
@@ -437,15 +428,13 @@ module.exports = function(app, passport) {
             text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous inscrire via ce lien: '
                 + constants.SERVER_ADDRESS + '/?id=' + user.id + ' \n\nA bientôt sur night-game.' 
         };
-        console.log("2");
         
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
                 logger.info(err)
                 return
             } 
-        }); 
-        console.log("3");
+        });
     };
 
     var sendEmailsToRegisteredUser = function(user) {
@@ -456,7 +445,6 @@ module.exports = function(app, passport) {
                 pass: 'n1ght.g4m3_1PL'
             }
         });
-        console.log("4");
 
         var mailOptions = {
             from: 'night.game.ipl@gmail.com',
@@ -465,14 +453,12 @@ module.exports = function(app, passport) {
             text: 'Vous êtes invité à participer à une soirée jeux via night-game.\nVeuillez vous connecter au site pour accèder à l\'invitation'
                 + '\n\nA bientôt sur night-game.' 
         };
-        console.log("5");
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
                 logger.info(err)
                 return
             }
-        }); 
-        console.log("6");
+        });
     };
 
     var sendConfirmationEmails = function(user, night, game) {
@@ -561,7 +547,6 @@ module.exports = function(app, passport) {
                     validateds.push(game.isValidated);
                     ids.push(mongoose.Types.ObjectId(game.id));
                 }
-                console.log(validated);
 
                 controller.find({
                     '_id' : {$in : ids}
@@ -579,7 +564,6 @@ module.exports = function(app, passport) {
                         'nbParticipants' : nbParticipants,
                         'validateds' : validateds
                     });
-                    console.log(toReturn);
                     i++;
                     if (i == nights.length) {
                         res.json({
@@ -885,8 +869,6 @@ module.exports = function(app, passport) {
                                 'nbParticipants' : game.nbParticipants
                             });
 
-                            console.log(toReturn);
-
                             i++;
                             if (i == nights.length) {
                                 res.json({
@@ -1006,8 +988,9 @@ module.exports = function(app, passport) {
     });
 
     // POST Cancel a night
-    app.post('night/:idNight/cancel', function(req, res) {
-        controllerNight.findById(idNight, function(err, night) {
+    app.post('/night/:idNight/cancel', function(req, res) {
+        var controller = controllers["night"];
+        controller.findById(req.params.idNight, function(err, night) {
             if (err) {
                 res.json({
                     success: false,
@@ -1019,7 +1002,7 @@ module.exports = function(app, passport) {
 
             night.status = constants.CANCELLED_NIGHT;
 
-            controllerNight.update(idNight, night, function (err, result) {
+            controller.update(req.params.idNight, night, function (err, result) {
                 if (err) {
                     res.json({
                         success: false,

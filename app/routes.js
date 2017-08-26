@@ -95,6 +95,9 @@ module.exports = function(app, passport) {
         if (req.url == "/isAuthenticated") {
             return next();
         }
+        if (req.url.indexOf("/user/") !== -1)  {
+            return next();
+        }
         if (! req.isAuthenticated()) {
             return res.status(405);
         }

@@ -216,18 +216,22 @@ $(document).ready(function() {
         var panel = $(this).closest('.panel');
         var tr = $(this).closest('tr');
 
-        $.ajax({
-            url: "night/" + $(panel).attr('id') + "/confirm/" + $(tr).attr('id'),
-            type: "post",
-            success: function(data, status, jqXHR) {
-                Utils.notifySucces("La soirée a bien été validée");
-                setTimeout(function() {
-                    location.reload();
-                }, 1000);
-            }, error() {
+        if ($(tr).find('.nbParticipants').first().html() < $(tr).find('.minPlayers').first().attr('nb')) {
+            notifyError('Le nombre de participants n\'est pas suffisant');
+        } else {
+            $.ajax({
+                url: "night/" + $(panel).attr('id') + "/confirm/" + $(tr).attr('id'),
+                type: "post",
+                success: function(data, status, jqXHR) {
+                    Utils.notifySucces("La soirée a bien été validée");
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                }, error() {
 
-            }
-        });
+                }
+            });
+        }
     })
 });
 
@@ -331,9 +335,9 @@ var functionsAfterConnection = function() {
 
                     for (var game of night.games) {
                         toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
-                            + "<td>" + game.minPlayers + "</td>"
+                            + "<td class='minPlayers' nb='" + game.minPlayers + "'>" + game.minPlayers + "</td>"
                             + "<td>" + game.maxPlayers + "</td>"
-                            + "<td>" + night.nbParticipants[j] + "</td>";
+                            + "<td class='nbParticipants'>" + night.nbParticipants[j] + "</td>";
                         if (! game.validated) {
                             toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> Valider</button></td>"
                         } else {

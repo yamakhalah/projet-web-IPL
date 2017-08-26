@@ -614,6 +614,7 @@ module.exports = function(app, passport) {
     });
 
     // POST update : validate a user in a night
+    // DO NOT USE !!!!!!
     app.post('/night/:idNight/validateUser', function(res, req) {
         var controller = controllers["night"];
         var id = req.params.id;
@@ -670,51 +671,79 @@ module.exports = function(app, passport) {
                 logger.info(err);
                 return
             }
-            var user = Array();
-            user.push({ userId : req.user._id });
+
+            console.log(req.user._id);
 
             var index = result.games.findIndex(function (game) {
-                if (game.id === idGame) {
+                if (game.userId === idGame) {
+                    console.log(game);
                     return game;
                 }
             });
 
-            controllerGame.findById(result.games[index].id, function (err, resultGame) {
-                if (err) {
-                    res.json({
-                        success: false,
-                        message: err
-                    });
-                    logger.info(err);
-                    return
-                }
-                
-                if (result.games[index].nbParticipants < resultGame.maxPlayers) {
-                    result.games[index].participants.push(user);
-                    result.games[index].nbParticipants++;
-        
-                    controller.update(result._id, result, function(err, result) {
-                        if (err) {
-                            res.json({
-                                success: false,
-                                message: err
-                            });
-                            logger.info(err);
-                            return
-                        }
-        
-                        res.json({
-                            success: true,
-                            message: "Vous avez bien été ajouté au jeu, vous pouvez désormais y participer"
-                        });
-                    });
-                } else {
-                    res.json({
-                        success: false,
-                        message: "Le nombre maximum à été atteint pour ce jeu."
-                    })
+            console.log(index);
+
+            var indexUser = result.games[index].participants.findIndex(function (user) {
+                if (user._id === req.user._id) {
+                    return user;
                 }
             });
+            console.log(indexUser);
+
+            if (indexUser === -1) {
+                console.log(result);
+                var indexGuest = result.guests.findIndex(function (user) {
+                    if (req.user._id.toString() === user.id) {
+                        console.log(user);
+                        return user;
+                    }
+                });
+
+                result.guests[indexGuest].isValidated = true;
+
+                controllerGame.findById(result.games[index].id, function (err, resultGame) {
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: err
+                        });
+                        logger.info(err);
+                        return
+                    }
+                    
+                    if (result.games[index].nbParticipants < resultGame.maxPlayers) {
+                        result.games[index].participants.push({ userId : req.user._id });
+                        result.games[index].nbParticipants++;
+            
+                        controller.update(result._id, result, function(err, result) {
+                            if (err) {
+                                res.json({
+                                    success: false,
+                                    message: err
+                                });
+                                logger.info(err);
+                                return
+                            }
+            
+                            res.json({
+                                success: true,
+                                message: "Vous avez bien été ajouté au jeu, vous pouvez désormais y participer"
+                            });
+                        });
+                    } else {
+                        res.json({
+                            success: false,
+                            message: "Le nombre maximum à été atteint pour ce jeu."
+                        }); 
+                    }
+                });
+            } else {
+                res.json({
+                    success: false,
+                    message: "Vous êtes déjà enregistré."
+                });
+            }
+            
         });
     });
 

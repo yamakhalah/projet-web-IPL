@@ -655,10 +655,10 @@ module.exports = function(app, passport) {
     });
 
     // POST update : add a participants to a game
-    app.post('/night/addParticipant', function(req, res) {
+    app.post('/night/:idNight/addParticipant/:idGame', function(req, res) {
         var controller = controllers["night"];
-        var idNight = req.body.idNight;
-        var idGame = req.body.idGame;
+        var idNight = req.params.idNight;
+        var idGame = req.params.idGame;
         var controllerGame = controllers["game"];
 
         controller.findById(idNight, function (err, result) {

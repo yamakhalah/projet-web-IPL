@@ -302,12 +302,8 @@ var functionsAfterConnection = function() {
         var idGame = $(tr).attr('id');
 
         $.ajax({
-            url: "/night/addParticipant",
+            url: "/night/" + idNight + "/addParticipant/" + idGame,
             type: "post",
-            data: {
-                'idNight': idNight,
-                'idGame': idGame
-            },
             success: function(data, status, jqXHR) {
                 Utils.notifySucces(data.message);
                 setTimeout(function() {

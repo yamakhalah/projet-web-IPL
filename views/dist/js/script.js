@@ -184,21 +184,13 @@ $(document).ready(function() {
     $('#navJeux').click(function() {
         $('#section-jeux').attr('style', 'display:block');
     })
-
-    // for(var i=0; i<24;i++){
-    //     for(var j=0; j<60; j+5){
-    //         var option = i+'H'+j;
-    //         $('#jsHourBegin').append('<option>'+option+'</option>')
-    //         $('#jsHourEnd').append('<option>'+option+'</option>')
-    //     }
-    // }
-
-    gamesHandler();
-    gameNightHandler();
 });
 
 // Add here the methods and events that should happen after the user is connected
 var functionsAfterConnection = function() {
+    gamesHandler();
+    gameNightHandler();
+
     // List all the nights to which the connected user has been invited to
     var nightsColumns = [
             {"data": null, "visible": true, "orderable": false},
@@ -241,7 +233,7 @@ var functionsAfterConnection = function() {
                     }
                     return data.description
                 },
-                "targets": 3 
+                "targets": 3
             },
             {
                 "render": function (data, type, row) {
@@ -283,13 +275,22 @@ var gameNightHandler = function() {
     var playableGamesColumns = [
             {"data": null, "visible": true, "orderable": false},
             {"data": "name", "visible": true, "searchable": true},
-            {"data": "description", "visible": true, "searchable": true},
+            {"data": null, "visible": true, "searchable": true},
             {"data": null, "visible": true, "searchable": true}
         ];
     var playableGamesColumnDefs = [
             {
                 "render": function ( data, type, row ) {
                     return "<input type='checkbox' id='" + data._id + "'/>";
+                },
+                "targets": 0
+            },
+            {
+                "render": function ( data, type, row ) {
+                    if (data.description == null) {
+                        return "";
+                    }
+                    return data.description;
                 },
                 "targets": 0
             },
@@ -495,7 +496,6 @@ function toggleSectionManagement(type) {
         $('#sectionCreateJeux').attr('style','display:none');
         $('#sectionManage').attr('style', 'display:block');
     }
-
 }
 
 var CheckInputForm = (function() {
@@ -769,9 +769,9 @@ var Init = (function() {
                     Utils.activeNavItem($(element).parent().attr('id'));
 
                     if (element.id === "displayManagement") {
-                    	CheckInputForm.clearFormCreation();
+                        CheckInputForm.clearFormCreation();
                     } else if (element.id === "displayGames") {
-                    	CheckInputForm.clearAddGameForm();
+                        CheckInputForm.clearAddGameForm();
                     } 
                 })
             }
@@ -788,8 +788,7 @@ var Init = (function() {
         navUser: navUser
     }
 
-})();
-
+})(); 
 
 var Utils = (function() {
 

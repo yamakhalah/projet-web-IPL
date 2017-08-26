@@ -91,11 +91,15 @@ module.exports = function(app, passport) {
 
     // Check if a user is connected before performing any action
     app.get('/*', function(req, res, next) {
-        if (! req.isAuthenticated()) {
-            res.status(405);
-            return;
+        if (req.url == "/webapp/bootstrap/bootstrap.min.css.map") {
+            return next();
         }
-
+        if (req.url == "/isAuthenicated") {
+            return next();
+        }
+        if (! req.isAuthenticated()) {
+            return res.status(405);
+        }
         return next();
     })
 

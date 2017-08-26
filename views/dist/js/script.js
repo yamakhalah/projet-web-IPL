@@ -228,12 +228,28 @@ $(document).ready(function() {
                     setTimeout(function() {
                         location.reload();
                     }, 1000);
-                }, error() {
-
+                }, error(jqXHR, status, err) {
+                    notifyError(err);
                 }
             });
         }
-    })
+    });
+
+    $("#nights-panels").on('click', '.cancel', function() {
+        var panel = $(this).closest('.panel');
+        $.ajax({
+            url: "/night/$(panel).attr('id')/cancel",
+            type: "post",
+            success: function(data, status, jqXHR) {
+                Utils.notifySucces("La soirée a bien été annulée");
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            }, error(jqXHR, status, err) {
+                notifyError(err);
+            }
+        });
+    }
 });
 
 // Add here the methods and events that should happen after the user is connected
@@ -334,16 +350,17 @@ var functionsAfterConnection = function() {
 
                     $(clone).find('.panel-body tbody').first().html("");
 
+                    console.log(night.validateds);
                     for (var game of night.games) {
                         toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
                             + "<td class='minPlayers' nb='" + game.minPlayers + "'>" + game.minPlayers + "</td>"
                             + "<td>" + game.maxPlayers + "</td>"
                             + "<td class='nbParticipants'>" + night.nbParticipants[j] + "</td>";
-                        if (! game.validated) {
+                        if (night.status != "CONFIRMED") {
                             toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> Valider</button></td>"
                         } else {
-                            if (game.validateds[j]) {
-                                toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success cancel'><i class='fa fa-check'></i> Annuler</button></td>"
+                            if (night.validateds[j]) {
+                                toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-danger cancel'><i class='fa fa-check'></i> Annuler</button></td>"
                             }
                         }
                         + "</tr>"

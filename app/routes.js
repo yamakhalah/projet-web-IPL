@@ -519,18 +519,15 @@ module.exports = function(app, passport) {
             controller = controllers["game"]
             for (let night of nights) {
                 let nbParticipants = Array();
-                var validated = false;
                 let validateds = Array();
 
                 let ids = new Array();
                 for (let game of night.games) {
                     nbParticipants.push(game.nbParticipants);
                     validateds.push(game.isValidated);
-                    if (game.isValidated) {
-                        validated = true;
-                    }
                     ids.push(mongoose.Types.ObjectId(game.id));
                 }
+                console.log(validated);
 
                 controller.find({
                     '_id' : {$in : ids}
@@ -546,9 +543,9 @@ module.exports = function(app, passport) {
                         'status' : night['status'],
                         'games' : games,
                         'nbParticipants' : nbParticipants,
-                        'validated' : validated,
                         'validateds' : validateds
                     });
+                    console.log(toReturn);
                     i++;
                     if (i == nights.length) {
                         res.json({

@@ -265,6 +265,8 @@ var functionsAfterConnection = function() {
                 for (var night of nights) {
                     var clone = $("#toClone").clone();
 
+                    $(clone).removeAttr('id');
+
                     var date = moment(night.date);
                     var startTime = moment(night.startTime);
                     var endTime = moment(night.endTime);

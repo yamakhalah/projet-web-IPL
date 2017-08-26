@@ -29,10 +29,8 @@ module.exports = function(app, passport) {
     app.get('/isAuthenticated', function(req, res) {
         logger.info("dedans?");
         if (req.isAuthenticated()) {
-            logger.info("ici?");
             res.status(200).send({ success: "logged in" });
         } else {
-            logger.info("Ou la?");
             res.status(400).send({ error: "not logged in" });
         }
     })
@@ -94,12 +92,14 @@ module.exports = function(app, passport) {
         if (req.url == "/webapp/bootstrap/bootstrap.min.css.map") {
             return next();
         }
-        if (req.url == "/isAuthenicated") {
+        if (req.url == "/isAuthenticated") {
             return next();
         }
         if (! req.isAuthenticated()) {
             return res.status(405);
         }
+
+        console.log(req.url);
         return next();
     })
 
@@ -108,7 +108,6 @@ module.exports = function(app, passport) {
             res.status(405);
             return;
         }
-
         return next();
     })
 
@@ -532,7 +531,6 @@ module.exports = function(app, passport) {
                 controller.find({
                     '_id' : {$in : ids}
                 }, function(err, games) {
-                    console.log(validated);
                     toReturn.push({
                         'id' : night['_id'],
                         'hostId' : night['hostId'],
@@ -547,8 +545,6 @@ module.exports = function(app, passport) {
                         'validated' : validated,
                         'validateds' : validateds
                     });
-                    console.log(toReturn);
-
                     i++;
                     if (i == nights.length) {
                         res.json({
@@ -835,6 +831,8 @@ module.exports = function(app, passport) {
                 return
             }
 
+            console.log("ixi?");
+
             var toReturn = new Array();
             controller = controllers['game'];
             for (var night of nights) {
@@ -950,6 +948,7 @@ module.exports = function(app, passport) {
                                             success: true,
                                             message: message
                                         })
+                                        return
                                     });
                                 }
                             });
@@ -958,17 +957,20 @@ module.exports = function(app, passport) {
                                 success: true,
                                 message: "Soirée mise à jour"
                             });
+                            return
                         });
                     } else {
                         res.json({
                             message: "Il n'y a pas assez de joueur."
                         });
+                        return
                     }
                 });
             } else {
                 res.json({
                     message: "Ce jeu n'existe pas dans cette soirée."
                 });
+                return
             } 
         });
     });
@@ -1117,8 +1119,6 @@ module.exports = function(app, passport) {
                             return
                         }
                     });
-
-                    console.log(night);
                 }
 
                 controller.find({

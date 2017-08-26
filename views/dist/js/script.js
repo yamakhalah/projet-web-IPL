@@ -148,8 +148,6 @@ $(document).ready(function() {
                 
                 night['games'] = games;
                 night['guests'] = guests;
-                
-                console.log(night);
 
                 $.ajax({
                     url: "/night",
@@ -289,7 +287,6 @@ var functionsAfterConnection = function() {
                 Utils.notifyError(data.message);
             } else {
                 var nights = data.data;
-                console.log(nights);
                 var i = 0;
                 for (var night of nights) {
                     var clone = $("#toClone").clone();

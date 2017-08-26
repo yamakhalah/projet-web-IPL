@@ -175,6 +175,11 @@ $(document).ready(function() {
                         if (! data.success) {
                             Utils.notifyError(data.message);
                         } else {
+                            newPanel = 1;
+                            Utils.resetForm($('#formCreation'));
+                            Utils.resetForm($('#formJeux'));
+                            Utils.resetForm($('#exemple2'));
+                            $('.pInvitationEmail').remove();
                             Utils.notifySucces("La soirée a bien été créée");
                         }
                     }, error: function(jqXHR, status, err) {
@@ -1116,12 +1121,20 @@ var Utils = (function() {
         });
     }
 
+    function resetForm($form) {
+        $form.find('input:text, input:password, input:file, select, textarea').val('');
+        $form.find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
+        $form[0].reset();
+    }
+
     return {
         toggleDiv: toggleDiv,
         activeNavItem: activeNavItem,
         notifySucces: notifySucces,
-        notifyError: notifyError
+        notifyError: notifyError,
+        resetForm: resetForm
     }
+
 })();
 
 var formToJson = function(selector) {

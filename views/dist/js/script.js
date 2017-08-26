@@ -883,6 +883,7 @@ var Init = (function() {
 
     function initNav() {
         $('#navbar li a').each(function(index, element) {
+            
             if (element.id === "disconnection") {
                 
             } else {

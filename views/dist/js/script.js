@@ -208,6 +208,7 @@ var functionsAfterConnection = function() {
             } else {
                 var nights = data.data;
                 console.log(nights);
+                var i = 0;
                 for (var night of nights) {
                     var clone = $("#toClone").clone();
 
@@ -222,7 +223,7 @@ var functionsAfterConnection = function() {
 
                     $(clone).find('.panel').first().attr('id', night.id);
 
-                    var i = 0; var j = 0;
+                    var j = 0;
 
                     $(clone).find('.panel-body tbody').first().html("");
                     for (var game of night.games) {
@@ -236,13 +237,16 @@ var functionsAfterConnection = function() {
                         j++;
                     }
                     
-                    $(clone).find('.panel-body').first().attr('id', "invite-table-" + i);
+                    $(clone).find('.panel-body table').first().attr('id', "invite-table-" + i);
+                    
                     i++;
-
-                    $("#invite-table-" + i).DataTable();
 
                     $(clone).removeAttr('hidden');
                     $("#invitations-panels").append(clone);
+                }
+                while (i >= 0) {
+                    $("#invite-table-" + i).DataTable();
+                    i--;
                 }
             }
         }, error: function(jqXHR, status, err) {

@@ -402,17 +402,10 @@ module.exports = function(app, passport) {
         
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
-                res.json({
-                    success: false,
-                    message: "Couldn't send email to " + user.email
-                })
                 logger.info(err)
-                return
+                return "Couldn't send email to " + user.email;
             } else {
-              res.json({
-                  success: true,
-                  message: "Email correctly send."
-              })
+              return "Email correctly send.";
             }
         }); 
     };
@@ -436,17 +429,10 @@ module.exports = function(app, passport) {
         
         transporter.sendMail(mailOptions, function(err, info){
             if (err) {
-                res.json({
-                    success: false,
-                    message: "Couldn't send email to " + user.email
-                })
                 logger.info(err)
-                return
+                return "Couldn't send email to " + user.email;
             } else {
-              res.json({
-                  success: true,
-                  message: "Email correctly send."
-              })
+              return "Email correctly send.";
             }
         }); 
     };
@@ -1030,11 +1016,15 @@ module.exports = function(app, passport) {
 
             req.body.guests.forEach(function(user, index) {
                 controller.findById(user.id, function(err, result) {
+                    var message;
                     if (result.hasOwnProperty('password')) {
-                        sendEmailsToRegisteredUser(result);
+                        message = sendEmailsToRegisteredUser(result);
                     } else {
-                        sendEmailsToUnregisteredUser(result);
+                        message =sendEmailsToUnregisteredUser(result);
                     }
+                    res.json({
+                        message: message
+                    })
                 })
             });
         });

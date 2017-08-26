@@ -772,7 +772,7 @@ var Init = (function() {
                         CheckInputForm.clearFormCreation();
                     } else if (element.id === "displayGames") {
                         CheckInputForm.clearAddGameForm();
-                    if ($(element).attr('id') !== undefined) {
+                    } if ($(element).attr('id') !== undefined) {
                         var idDiv = "div" + element.id.substring(7);
                         Utils.toggleDiv(idDiv);
                         Utils.activeNavItem($(element).parent().closest('li[id]').attr('id'));

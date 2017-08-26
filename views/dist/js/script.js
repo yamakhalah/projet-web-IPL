@@ -132,6 +132,7 @@ $(document).ready(function() {
                 }
                 
                 // 2 - Create Night
+                
                 var night = formToJson('formCreation');
                 var regex = new RegExp('^[0-9]{4}\-[0-9]{2}\-[0-9]{2}$');
                 if (regex.test(night['date'])){
@@ -149,8 +150,7 @@ $(document).ready(function() {
                 for (var i=0; i < inputTabGames.length; i++) {
                     var game = {
                         id : $(inputTabGames[i]).attr('id'),
-                        nbParticipants : 0,
-                        isValidated : false
+                        nbParticipants : 0
                     }
                     games.push(game);
                 }
@@ -166,7 +166,6 @@ $(document).ready(function() {
                 
                 night['games'] = games;
                 night['guests'] = guests;
-
                 $.ajax({
                     url: "/night",
                     type: "post",
@@ -174,6 +173,9 @@ $(document).ready(function() {
                     success: function(data, status, jqXHR) {
                         if (! data.success) {
                             Utils.notifyError(data.message);
+                        } 
+                        else if(typeof data.message !== 'undefined' && data.message.indexOf("nous n'avons pas pu envoyer d'invitations à ces personnes :") != -1){
+                            Utils.notifySucces("La soirée a bien été créée cependant " + data.message);
                         } else {
                             newPanel = 1;
                             Utils.resetForm($('#formCreation'));
@@ -185,10 +187,9 @@ $(document).ready(function() {
                     }, error: function(jqXHR, status, err) {
                         Utils.notifyError(status);
                     }
-                });       
+                });
                 break;
         }
-
     	if (newPanel !== 0) {
             $('div[class="tab-pane fade active in"]').removeClass("active in");
             $('a[href="#' + idPanel +'"]').parent().removeClass("active");
@@ -216,19 +217,39 @@ $(document).ready(function() {
         var panel = $(this).closest('.panel');
         var tr = $(this).closest('tr');
 
+        if ($(tr).find('.nbParticipants').first().html() < $(tr).find('.minPlayers').first().attr('nb')) {
+            notifyError('Le nombre de participants n\'est pas suffisant');
+        } else {
+            $.ajax({
+                url: "night/" + $(panel).attr('id') + "/confirm/" + $(tr).attr('id'),
+                type: "post",
+                success: function(data, status, jqXHR) {
+                    Utils.notifySucces("La soirée a bien été validée");
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                }, error(jqXHR, status, err) {
+                    notifyError(err);
+                }
+            });
+        }
+    });
+
+    $("#nights-panels").on('click', '.cancel', function() {
+        var panel = $(this).closest('.panel');
         $.ajax({
-            url: "night/" + $(panel).attr('id') + "/confirm/" + $(tr).attr('id'),
+            url: "/night/$(panel).attr('id')/cancel",
             type: "post",
             success: function(data, status, jqXHR) {
-                Utils.notifySucces("La soirée a bien été validée");
+                Utils.notifySucces("La soirée a bien été annulée");
                 setTimeout(function() {
                     location.reload();
                 }, 1000);
-            }, error() {
-
+            }, error(jqXHR, status, err) {
+                notifyError(err);
             }
         });
-    })
+    }
 });
 
 // Add here the methods and events that should happen after the user is connected
@@ -329,16 +350,17 @@ var functionsAfterConnection = function() {
 
                     $(clone).find('.panel-body tbody').first().html("");
 
+                    console.log(night.validateds);
                     for (var game of night.games) {
                         toAdd = "<tr id='" + game._id + "'><td>" + game.name + "</td>"
-                            + "<td>" + game.minPlayers + "</td>"
+                            + "<td class='minPlayers' nb='" + game.minPlayers + "'>" + game.minPlayers + "</td>"
                             + "<td>" + game.maxPlayers + "</td>"
-                            + "<td>" + night.nbParticipants[j] + "</td>";
-                        if (! game.validated) {
+                            + "<td class='nbParticipants'>" + night.nbParticipants[j] + "</td>";
+                        if (night.status != "CONFIRMED") {
                             toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success validate'><i class='fa fa-check'></i> Valider</button></td>"
                         } else {
-                            if (game.validateds[j]) {
-                                toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-success cancel'><i class='fa fa-check'></i> Annuler</button></td>"
+                            if (night.validateds[j]) {
+                                toAdd += "<td style='text-align: center;'><button type='button' class='btn btn-danger cancel'><i class='fa fa-check'></i> Annuler</button></td>"
                             }
                         }
                         + "</tr>"

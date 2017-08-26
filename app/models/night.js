@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 var nightSchema = mongoose.Schema({
     hostId : String,
-    name: String,
+    name : String,
     date : Date,
     startTime : Date,
     endTime : Date,

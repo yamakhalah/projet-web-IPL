@@ -1086,7 +1086,7 @@ module.exports = function(app, passport) {
                     i++;
                     if (i == nights.length) {
                         res.json({
-                            data: toReturn,
+                            data: toReturn.sort({ date : 1}),
                             success: true
                         })
                     }

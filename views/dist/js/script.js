@@ -772,6 +772,16 @@ var Init = (function() {
                         CheckInputForm.clearFormCreation();
                     } else if (element.id === "displayGames") {
                         CheckInputForm.clearAddGameForm();
+                    if ($(element).attr('id') !== undefined) {
+                        var idDiv = "div" + element.id.substring(7);
+                        Utils.toggleDiv(idDiv);
+                        Utils.activeNavItem($(element).parent().closest('li[id]').attr('id'));
+
+                        if (element.id === "displayManagementCreate") {
+                            CheckInputForm.clearFormCreation();
+                        } else if (element.id === "displayGames") {
+                            CheckInputForm.clearAddGameForm();
+                        }
                     } 
                 })
             }
@@ -801,7 +811,10 @@ var Utils = (function() {
 
     function activeNavItem(navItemToDisplay) {
         var currentActive = getCurrentActiveNavItem()
-        $(currentActive).removeClass("active")
+        $(currentActive).removeClass("active");
+        if (navItemToDisplay.substring(0,18) === 'displayManagement') {
+            navItemToDisplay = 'management';
+        }
         $('#' + navItemToDisplay).addClass("active");
     }
 

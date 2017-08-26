@@ -664,29 +664,22 @@ module.exports = function(app, passport) {
                 return
             }
 
-            console.log(req.user._id);
-
             var index = result.games.findIndex(function (game) {
                 if (game.id === idGame) {
-                    console.log(game);
                     return game;
                 }
             });
 
-            console.log(index);
 
             var indexUser = result.games[index].participants.findIndex(function (user) {
-                if (user.userId === req.user._id) {
+                if (user.userId === req.user._id.toString()) {
                     return user;
                 }
             });
-            console.log(indexUser);
 
             if (indexUser === -1) {
-                console.log(result);
                 var indexGuest = result.guests.findIndex(function (user) {
                     if (req.user._id.toString() === user.id) {
-                        console.log(user);
                         return user;
                     }
                 });
@@ -1014,8 +1007,6 @@ module.exports = function(app, passport) {
         var controller = controllers["night"]
 
         controller.findByDate({"guests": {$elemMatch: {id: req.user._id.toString()}}}, function(err, nights) {
-            console.log(nights);
-            console.log();
             if (err) {
                 res.json({
                     success: false,
@@ -1030,7 +1021,6 @@ module.exports = function(app, passport) {
             var toReturn = new Array();
             controller = controllers["game"]
             for (let night of nights) {
-                console.log(night);
                 let nbParticipants = Array();
 
                 let ids = new Array();
@@ -1056,7 +1046,6 @@ module.exports = function(app, passport) {
                     });
 
                     i++;
-                    console.log(nights.length);
                     if (i == nights.length) {
                         res.json({
                             data: toReturn,

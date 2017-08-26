@@ -853,9 +853,7 @@ module.exports = function(app, passport) {
             });
 
             if (index !== -1) {
-                night.games[index].isValidated = true;
-
-                night.status = constants.CONFIRMED_NIGHT;
+                
 
                 controllerGame.findById(idGame, function (err, game) {
                     if (err) {
@@ -867,38 +865,48 @@ module.exports = function(app, passport) {
                         return
                     }
 
-                    controllerNight.update(idNight, night, function (err, result) {
-                        if (err) {
-                            res.json({
-                                success: false,
-                                message: err
-                            })
-                            logger.info(err)
-                            return
-                        }
-
-                        night.guests.forEach(function(user, i) {
-                            if (user.isValidated === true) {
-                                controllerUser.findById(user.id, function(err, userDB) {
-                                    var message = sendConfirmationEmails(userDB, night, game);
-                                    res.json({
-                                        success: true,
-                                        message: message
-                                    })
-                                });
+                    if (night.games[index].nbParticipants >= game.minPlayers) {
+                        night.games[index].isValidated = true;
+                        
+                        night.status = constants.CONFIRMED_NIGHT;
+    
+                        controllerNight.update(idNight, night, function (err, result) {
+                            if (err) {
+                                res.json({
+                                    success: false,
+                                    message: err
+                                })
+                                logger.info(err)
+                                return
                             }
+    
+                            night.guests.forEach(function(user, i) {
+                                if (user.isValidated === true) {
+                                    controllerUser.findById(user.id, function(err, userDB) {
+                                        var message = sendConfirmationEmails(userDB, night, game);
+                                        res.json({
+                                            success: true,
+                                            message: message
+                                        })
+                                    });
+                                }
+                            });
+    
+                            res.json({
+                                success: true,
+                                message: "Soirée mise à jour"
+                            });
                         });
-
+                    } else {
                         res.json({
-                            success: true,
-                            message: "Soirée mise à jour"
+                            message: "Il n'y a pas assez de joueur."
                         });
-                    });
+                    }
                 });
             } else {
                 res.json({
                     message: "Ce jeu n'existe pas dans cette soirée."
-                })
+                });
             } 
         });
     });

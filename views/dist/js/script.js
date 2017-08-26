@@ -415,7 +415,7 @@ var gameNightHandler = function() {
                     }
                     return data.description;
                 },
-                "targets": 0
+                "targets": 2
             },
             {
                 "render": function (data, type, row) {
@@ -573,8 +573,7 @@ var gamesHandler = function() {
             {"data": "image", "visible": true, "orderable": false},
             {"data": "name", "visible": true, "searchable": true},
             {"data": null, "visible": true, "searchable": true},
-            {"data": null, "visible": true, "searchable": false},
-            {"data": null, "visible": true, "orderable": false}
+            {"data": null, "visible": true, "searchable": false}
         ];
     var gamesColumnDefs = [
             {
@@ -591,12 +590,6 @@ var gamesHandler = function() {
                     return data.minPlayers + ' / ' + data.maxPlayers;
                 },
                 "targets": 3
-            },
-            {
-                "render": function ( data, type, row ) {
-                    return '<button type="button" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>';
-                },
-                "targets": 4
             }
         ];
     gamesTable = initDatatable("gamesTable", "/games", gamesColumns, gamesColumnDefs);

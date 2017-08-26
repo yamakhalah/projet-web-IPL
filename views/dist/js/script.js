@@ -202,7 +202,9 @@ var functionsAfterConnection = function() {
     // List all the nights to which the connected user has been invited to
     var nightsColumns = [
             {"data": null, "visible": true, "orderable": false},
-            {"data": "description", "visible": true, "searchable": true},
+            {"data": null, "visible": true, "orderable": false},
+            {"data": null, "visible": true, "orderable": false},
+            {"data": null, "visible": true, "searchable": true},
             {"data": null, "visible": true},
             {"data": null, "visible": true},
             {"data": null, "visible": true}
@@ -224,20 +226,22 @@ var functionsAfterConnection = function() {
                 "targets": 1
             },
             {
-                "render": function ( data, type, row ) {
-                    console.log(data);
+                "render": function (data, type, row) {
+                    if (data.name == null) {
+                        return "";
+                    }
                     return data.name
                 },
                 "targets": 2
             },
             {
-                "render": function ( data, type, row ) {
-                    console.log(data);
-                    console.log(type);
-                    console.log(row);
+                "render": function (data, type, row) {
+                    if (data.description == null) {
+                        return "";
+                    }
                     return data.description
                 },
-                "targets": 3
+                "targets": 3 
             },
             {
                 "render": function (data, type, row) {
@@ -252,10 +256,12 @@ var functionsAfterConnection = function() {
             },
             {
                 "render": function (data, type, row) {
-                    
-                    return toReturn
+                    if (data.guests == null) {
+                        return "0"
+                    }
+                    return data.guests.length;
                 },
-                "targets": 4
+                "targets": 5
             },
             {
                 "render": function (data, type, row) {
@@ -311,11 +317,6 @@ var gameNightHandler = function() {
             }
         ]
     initDatatable("invite-guests-table", "/users", guestTableColumns, guestTableColumnDefs);
-
-    // Create night 
-    $("#sendInvitesButton").on('click', function() {
-        
-    })
 }
 
 var User = (function() {

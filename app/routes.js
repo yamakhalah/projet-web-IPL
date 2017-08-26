@@ -659,6 +659,7 @@ module.exports = function(app, passport) {
         var controller = controllers["night"];
         var idNight = req.body.idNight;
         var idGame = req.body.idGame;
+        var controllerGame = controllers["game"];
 
         controller.findById(idNight, function (err, result) {
             if (err) {
@@ -678,10 +679,7 @@ module.exports = function(app, passport) {
                 }
             });
 
-            result.games[index].participants.push(user);
-            result.games[index].nbParticipants++;
-
-            controller.update(result._id, result, function(err, result) {
+            controllerGame.findById(result.games[index].id, function (err, resultGame) {
                 if (err) {
                     res.json({
                         success: false,
@@ -690,11 +688,32 @@ module.exports = function(app, passport) {
                     logger.info(err);
                     return
                 }
-
-                res.json({
-                    success: true,
-                    message: "Vous avez bien été ajouté au jeu, vous pouvez désormais y participer"
-                });
+                
+                if (result.games[index].nbParticipants < resultGame.maxPlayers) {
+                    result.games[index].participants.push(user);
+                    result.games[index].nbParticipants++;
+        
+                    controller.update(result._id, result, function(err, result) {
+                        if (err) {
+                            res.json({
+                                success: false,
+                                message: err
+                            });
+                            logger.info(err);
+                            return
+                        }
+        
+                        res.json({
+                            success: true,
+                            message: "Vous avez bien été ajouté au jeu, vous pouvez désormais y participer"
+                        });
+                    });
+                } else {
+                    res.json({
+                        success: false,
+                        message: "Le nombre maximum à été atteint pour ce jeu."
+                    })
+                }
             });
         });
     });
@@ -723,24 +742,31 @@ module.exports = function(app, passport) {
                 }
             });
 
-            result.games[index].participants.splice(index, 1);
-            result.games[index].nbParticipants--;
-
-            controller.update(result._id, result, function(err, result) {
-                if (err) {
+            if (result.games[index].nbParticipants > 0) {
+                result.games[index].participants.splice(index, 1);
+                result.games[index].nbParticipants--;
+    
+                controller.update(result._id, result, function(err, result) {
+                    if (err) {
+                        res.json({
+                            success: false,
+                            message: err
+                        });
+                        logger.info(err);
+                        return
+                    }
+    
                     res.json({
-                        success: false,
-                        message: err
+                        success: true,
+                        message: "User added to the game"
                     });
-                    logger.info(err);
-                    return
-                }
-
-                res.json({
-                    success: true,
-                    message: "User added to the game"
                 });
-            })
+            } else {
+                res.json({
+                    success: false,
+                    message: "There is no user in this game."
+                })
+            }
         })
     });
 
@@ -844,7 +870,7 @@ module.exports = function(app, passport) {
 
             req.body.guests.forEach(function(user, index) {
                 controller.findById(user.id, function(err, result) {
-                    if (result.password !== null) {
+                    if (result.hasOwnProperty('password')) {
                         sendEmailsToRegisteredUser(result);
                     } else {
                         sendEmailsToUnregisteredUser(result);

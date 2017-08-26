@@ -141,7 +141,8 @@ $(document).ready(function() {
                             
                             night['games'] = games;
                             night['guests'] = guests;
-                            
+                            console.log(night);
+
                             $.ajax({
                                 url: "/night",
                                 type: "post",

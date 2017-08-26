@@ -796,7 +796,11 @@ module.exports = function(app, passport) {
         var dateNow = Date.now();
         var controller = controllers["night"];
 
-        controller.find({ date : {$gt: dateNow}}, function(err, result) {
+        controller.find({
+            date : {$gt: dateNow},
+            "games.participants": {$elemMatch: {id: req.user._id.toString()}},
+            "games.isValidated": true
+        }, function(err, nights) {
             if (err) {
                 res.json({
                     success: false,
@@ -806,12 +810,36 @@ module.exports = function(app, passport) {
                 return
             }
 
-            
+            var toReturn = new Array();
+            controller = controllers['game'];
+            for (var night of nights) {
+                for (var game of night.games) {
+                    if (game.isValidated) {
+                        controller.findById(mongoose.Types.ObjectId(game.id), function(err, fullGame) {
+                            toReturn.push({
+                                'id' : night['_id'],
+                                'hostId' : night['hostId'],
+                                'name' : night['name'],
+                                'date' : night['date'],
+                                'startTime' : night['startTime'],
+                                'endTime' : night['endTime'],
+                                'description' : night['description'],
+                                'status' : night['status'],
+                                'game' : fullGame,
+                                'nbParticipants' : game.nbParticipants
+                            });
 
-            res.json({
-                success: true,
-                data: result.sort({date: 1})
-            })
+                            i++;
+                            if (i == nights.length) {
+                                res.json({
+                                    data: toReturn,
+                                    success: true
+                                })
+                            }
+                        })
+                    }
+                }
+            }
         })
     });
 
@@ -1058,7 +1086,6 @@ module.exports = function(app, passport) {
                     });
 
                     i++;
-                    console.log(nights.length);
                     if (i == nights.length) {
                         res.json({
                             data: toReturn,
